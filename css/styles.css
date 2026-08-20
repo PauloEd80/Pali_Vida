@@ -1,0 +1,1009 @@
+/* =========================================================================
+   PaliVida — folha de estilos
+   Porta fiel de frontend/src/theme/index.ts + os StyleSheet.create() de cada
+   tela/componente do código-fonte original (React Native / Expo). Os
+   comentários apontam de qual arquivo .tsx cada bloco vem.
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap');
+
+:root {
+  /* theme/index.ts -> colors */
+  --azul: #112A6C;
+  --azul-medio: #015184;
+  --azul-claro: #8BAAC4;
+  --azul-botao: #5A90BF;
+
+  --creme: #FFF3E5;
+  --areia: #E8DAC0;
+  --areia-clara: #F2E8D5;
+  --branco: #FFFFFF;
+  --branco-quente: #FFF6E5;
+
+  --marrom: #532C1D;
+  --verde-escuro: #183102;
+  --cinza: #4A4A4A;
+  --cinza-claro: #666666;
+
+  --verde: #9BC45A;
+  --verde-suave: #A6C27A;
+  --amarelo: #FFBE3B;
+  --amarelo-suave: #F1D359;
+  --vermelho: #D00000;
+  --vermelho-suave: #F79F9A;
+  --laranja: #E8994B;
+  --laranja-escuro: #E78F47;
+
+  --sucesso-fundo: #D1FAE5;
+  --erro-fundo: #FEE2E2;
+  --erro-texto: #991B1B;
+  --perigo: #A00000;
+  --perigo-claro: #D94141;
+  --destaque: #C4C776;
+  --logout: #FFBB00;
+
+  /* theme/index.ts -> radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 15px;
+  --radius-pill: 25px;
+
+  --fonte-regular: 'Comfortaa', sans-serif;
+  --fonte-bold: 'Comfortaa', sans-serif;
+
+  /* theme/index.ts -> coresAlerta (fundo da Home conforme último alerta) */
+  --alerta-padrao: var(--creme);
+  --alerta-verde: var(--verde-suave);
+  --alerta-amarelo: var(--amarelo-suave);
+  --alerta-vermelho: var(--vermelho-suave);
+}
+
+/* ---------------------------------------------------------------- reset */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--fonte-regular);
+  color: var(--marrom);
+  background: #CFC6B8;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, p { margin: 0; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid #2F6FED; outline-offset: 2px; }
+
+/* --------------------------------------------------------- app "phone" shell ---
+   Usa 100dvh (dynamic viewport height) em vez de 100vh: em navegadores
+   mobile (Safari/Chrome no celular) 100vh inclui a área por trás das barras
+   de endereço/navegação, o que "corta" o rodapé em muitos aparelhos. 100dvh
+   se ajusta à altura real visível, então o app cabe certinho em qualquer
+   tamanho de tela — com fallback para 100vh em navegadores mais antigos. */
+.app-shell {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--creme);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.app-main {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* necessário para que filhos flex com altura 100% não estourem o .app-shell */
+}
+/* Telas marcadas como "sem rolagem" (ex.: menu de sintomas) devem caber
+   inteiramente na viewport do app-shell, sem scroll vertical algum. */
+.app-main.pv-sem-scroll {
+  overflow: hidden;
+}
+@media (min-width: 640px) {
+  body { padding: 28px 12px; }
+  .app-shell {
+    height: calc(100vh - 56px);
+    height: calc(100dvh - 56px);
+    min-height: 640px;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(17, 42, 108, 0.35);
+    border: 10px solid #1b1b1b;
+  }
+}
+
+/* loading fallback while fonts load */
+#carregando-app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--creme);
+}
+
+/* ======================================================== Header.tsx ===
+   Cabeçalho global, montado uma única vez pelo roteador dentro de
+   #app-header (fora da área rolável) — por isso fica sempre visível,
+   igual ao rodapé.
+   - Nas telas autenticadas: só o ícone da marca (sem a tarja azul de
+     fundo e sem o nome por extenso), ancorado no canto superior esquerdo.
+   - Na tela de login/cadastro: o roteador deixa o header GLOBAL escondido
+     e a própria tela de auth desenha seu cabeçalho de marca (logo + nome,
+     também sem tarja) — ver .pv-header--login mais abaixo e headerLogin()
+     em ui.js. */
+.pv-header {
+  width: 100%;
+  min-height: 52px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  flex-shrink: 0;
+}
+.pv-header .pv-logo-icone {
+  height: 34px;
+  width: auto;
+}
+/* Cabeçalho de marca da tela de login/cadastro: logo + "PaliVida" juntos,
+   centralizados, sem tarja de fundo (imagem única fornecida pelo cliente). */
+.pv-header.pv-header--login {
+  justify-content: center;
+  padding: 18px 16px 4px;
+}
+.pv-header--login .pv-logo-completo {
+  height: 46px;
+  width: auto;
+}
+
+/* ======================================================== Footer.tsx ===
+   Rodapé global de navegação, montado pelo roteador dentro de #app-footer
+   (fora da área rolável) — por isso os 3 (ou 4, para o administrador)
+   atalhos ficam sempre visíveis em qualquer tela autenticada, sem depender
+   de o usuário rolar até o final do conteúdo. */
+.pv-footer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex-shrink: 0;
+  border: 0;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255, 255, 255, 0.92);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.pv-footer button {
+  flex: 1;
+  background: none;
+  border: 0;
+  padding: 12px 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pv-footer img { width: 24px; height: 24px; opacity: 0.45; }
+.pv-footer button.ativo img { opacity: 1; }
+.pv-footer button.ativo { box-shadow: inset 0 2px 0 var(--azul); }
+
+/* ========================================================= Aviso.tsx === */
+.pv-aviso {
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  width: 100%;
+  font-size: 14px;
+  text-align: center;
+}
+.pv-aviso.sucesso { background: var(--sucesso-fundo); color: #065F46; }
+.pv-aviso.erro { background: var(--erro-fundo); color: var(--erro-texto); }
+
+/* generic loading */
+.pv-carregando {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 240px;
+  color: var(--azul);
+}
+.pv-spinner {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(17,42,108,0.15);
+  border-top-color: var(--azul);
+  animation: girar 0.8s linear infinite;
+}
+.pv-spinner.claro { border-color: rgba(255,255,255,0.35); border-top-color: #fff; }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* =============================================================== Chips === */
+.pv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+.pv-chip {
+  border: 1.5px solid var(--azul-claro);
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: var(--branco);
+  color: var(--marrom);
+  font-size: 14px;
+  font-family: var(--fonte-regular);
+}
+.pv-chip.ativo { background: var(--azul-medio); border-color: var(--azul-medio); color: var(--branco); }
+
+/* =========================================== telas de autenticação (Login/Cadastro) === */
+.tela-auth {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--creme);
+  padding-bottom: 40px;
+}
+.tela-auth .titulo { font-size: 48px; font-weight: 600; color: var(--azul); margin: 15px 0 25px; }
+.tela-auth .instrucao {
+  font-size: 15px; color: var(--marrom); text-align: center;
+  width: 230px; margin-bottom: 20px; line-height: 22px;
+}
+.tela-auth .label {
+  font-size: 20px; font-weight: 700; color: var(--marrom);
+  margin-bottom: 5px; width: 230px; text-align: left; display: block;
+}
+.tela-auth .campo {
+  padding: 10px 20px;
+  background: var(--azul-claro);
+  color: var(--branco);
+  border: 0;
+  border-radius: var(--radius-md);
+  width: 230px;
+  height: 50px;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+.tela-auth .campo::placeholder { color: var(--branco-quente); }
+.tela-auth .aviso-wrap { width: 230px; }
+.tela-auth .link-secundario {
+  width: 230px; background: none; border: 0; padding: 0;
+  display: flex; justify-content: flex-end; margin-bottom: 4px;
+}
+.tela-auth .link-esqueci { font-size: 13px; color: var(--marrom); text-decoration: underline; }
+.tela-auth .link-voltar { font-size: 16px; color: var(--marrom); background: none; border: 0; }
+.tela-auth .botao-entrar {
+  margin-top: 30px; margin-bottom: 10px;
+  padding: 10px;
+  background: var(--azul-medio);
+  color: var(--branco);
+  border: 0;
+  border-radius: var(--radius-md);
+  width: 120px; height: 50px;
+  font-size: 24px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.tela-auth .botao-entrar[disabled] { opacity: 0.6; }
+.tela-auth .botao-entrar.largo { width: 230px; }
+.tela-auth .ou-cadastre { font-size: 20px; background: none; border: 0; color: var(--marrom); }
+
+/* ============================================================ Cadastro === */
+.tela-cadastro { background: var(--creme); }
+.tela-cadastro .subtitulo { font-size: 18px; color: var(--marrom); margin-bottom: 30px; text-align: center; }
+.tela-cadastro .botoes-tipo { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin: 10px 0; gap: 12px; }
+.tela-cadastro .botao-tipo {
+  background: var(--azul-medio); border: 0; border-radius: var(--radius-md);
+  width: 150px; height: 101px; color: var(--branco-quente); font-size: 18px;
+  line-height: 26px; text-align: center;
+  box-shadow: 4px 4px 6px rgba(0,0,0,0.25);
+}
+.tela-cadastro .form { width: 85%; max-width: 480px; }
+.tela-cadastro .secao {
+  font-size: 18px; font-weight: 700; color: var(--azul);
+  margin: 20px 0 10px; border-bottom: 1px solid var(--azul-claro); padding-bottom: 4px;
+}
+.tela-cadastro .campo-label { font-size: 16px; color: var(--marrom); margin-bottom: 5px; font-weight: 700; display: block; }
+.tela-cadastro .campo {
+  padding: 10px 10px 10px 15px; background: var(--azul-claro); color: var(--branco);
+  border: 0; border-radius: var(--radius-md); width: 100%; height: 50px; margin-bottom: 15px; font-size: 15px;
+}
+.tela-cadastro .campo::placeholder { color: var(--branco-quente); }
+.tela-cadastro textarea.campo { height: 90px; padding-top: 10px; resize: vertical; }
+.tela-cadastro .obrigatorio { font-size: 13px; color: #888; margin: 10px 0 5px; }
+.tela-cadastro .botao-enviar {
+  width: 85%; max-width: 480px; background: var(--azul-medio); color: var(--branco-quente);
+  border: 0; padding: 16px; border-radius: var(--radius-md); margin-top: 20px; font-size: 18px; font-weight: 700;
+}
+.tela-cadastro .botao-enviar[disabled] { opacity: 0.6; }
+.tela-cadastro .botao-voltar {
+  width: 85%; max-width: 480px; background: var(--branco); color: var(--cinza);
+  border: 0; padding: 14px; border-radius: var(--radius-md); margin-top: 15px; margin-bottom: 10px;
+  font-size: 18px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* ================================================================ Home === */
+/* ================================================================ Home ===
+   Reorganizada para caber inteira na viewport sem rolagem: os elementos
+   dividem o espaço disponível de .app-main via flexbox (com tamanhos em
+   clamp()/vh em vez de pixels fixos grandes), no mesmo espírito da tela de
+   Menu de Sintomas — ver .tela-menu-sintomas mais abaixo. */
+.tela-home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.tela-home .corpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  min-height: 0;
+  padding: 4px 16px 10px;
+}
+.tela-home .titulo {
+  font-weight: 700; font-size: clamp(16px, 5vw, 22px); margin: 0 0 4px; color: var(--verde-escuro);
+  text-align: center; flex-shrink: 0;
+}
+.tela-home .botao-prontuario {
+  background: var(--laranja); width: 100%; max-width: 320px; border: 0; border-radius: var(--radius-md);
+  color: var(--branco); font-size: clamp(14px, 4vw, 18px); font-weight: 700; display: flex; align-items: center; justify-content: center;
+  margin: 6px auto 0; flex: 0 1 52px; min-height: 40px; flex-shrink: 0;
+}
+.tela-home .botao-duvidas {
+  background: var(--branco); border: 2px solid #767714; border-radius: 50%;
+  margin: 8px auto; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: clamp(15px, 4.5vw, 24px); color: var(--verde-escuro); text-align: center; padding: 10px;
+  flex-shrink: 1; min-height: 0; width: min(46vw, 220px); aspect-ratio: 1 / 1;
+}
+.tela-home .botao-registrar {
+  background: var(--azul-medio); width: 100%; max-width: 320px; border: 0; border-radius: var(--radius-md);
+  color: var(--branco-quente); font-size: clamp(13px, 3.6vw, 16px); display: flex; align-items: center; justify-content: center;
+  margin: 0 auto; flex: 0 1 44px; min-height: 36px; flex-shrink: 0;
+}
+.tela-home .contatos { flex-shrink: 0; margin-top: 8px; }
+.tela-home .contatos-titulo { margin-bottom: 6px; font-weight: 700; font-size: clamp(14px, 4vw, 18px); color: var(--verde-escuro); text-align: center; }
+.tela-home .contatos-botoes { display: flex; justify-content: space-around; width: 100%; gap: 8px; }
+.tela-home .contato-botao {
+  background: var(--branco); flex: 1; max-width: 125px; padding: 8px 6px; border: 2px solid var(--branco);
+  border-radius: var(--radius-md); text-align: center; font-weight: 700; font-size: clamp(12px, 3.4vw, 16px); color: #000;
+}
+
+/* ============================================================ Contato === */
+.tela-contato { flex: 1; background: var(--creme); padding: 0 16px 24px; }
+.tela-contato .titulo { font-size: 22px; font-weight: 700; color: var(--azul); text-align: center; margin: 20px 0 6px; }
+.tela-contato .subtitulo { font-size: 13px; color: var(--marrom); text-align: center; margin: 0 0 16px; }
+.pv-contato-acoes { display: flex; gap: 10px; margin-top: 14px; }
+.pv-contato-acoes .pv-botao-primario, .pv-contato-acoes .pv-botao-secundario { flex: 1; text-align: center; text-decoration: none; }
+
+/* ============================================================== Busca === */
+.tela-busca { flex: 1; background: var(--areia); width: 100%; padding-top: 20px; display: flex; flex-direction: column; }
+.tela-busca .busca-container {
+  display: flex; align-items: center; background: var(--branco); border-radius: var(--radius-pill);
+  padding: 0 15px; margin: 20px auto; width: 90%; height: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.tela-busca .busca-input { flex: 1; border: 0; background: none; color: var(--azul); padding: 10px; font-size: 16px; }
+.tela-busca .busca-input:focus { outline: none; }
+.tela-busca .icone-lupa { width: 22px; height: 22px; background: none; border: 0; padding: 0; filter: invert(13%) sepia(53%) saturate(3000%) hue-rotate(215deg); }
+.tela-busca .botao-novo {
+  background: var(--azul); color: var(--branco); border: 0; padding: 12px 20px; border-radius: 8px;
+  display: block; margin: 0 auto 20px; font-weight: 700;
+}
+.tela-busca .aviso-wrap { width: 90%; margin: 0 auto; }
+.tela-busca .lista-vazia { text-align: center; color: var(--marrom); margin-top: 20px; }
+
+.pv-card-conteudo {
+  width: 90%; margin: 0 auto 20px; background: var(--branco); padding: 20px; border-radius: var(--radius-lg);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.pv-card-conteudo .card-titulo { font-weight: 700; font-size: 18px; color: var(--azul); }
+.pv-card-conteudo .divisor { height: 1px; background: var(--areia); margin: 10px 0; }
+.pv-card-conteudo .card-descricao {
+  font-size: 14px; color: #333; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pv-card-conteudo .card-rodape { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+.pv-card-conteudo .botao-ler {
+  display: flex; align-items: center; gap: 5px; background: #F0F0F0; border: 0; padding: 8px; border-radius: 5px;
+  color: var(--azul); font-weight: 600; font-size: 12px;
+}
+.pv-card-conteudo .botao-ler img { width: 16px; height: 16px; }
+.pv-card-conteudo .data { color: #888; font-size: 12px; }
+.pv-card-conteudo .acoes-admin {
+  display: flex; justify-content: flex-end; gap: 15px; margin-top: 15px; border-top: 1px solid #EEE; padding-top: 10px;
+}
+.pv-card-conteudo .acao-editar { background: none; border: 0; color: var(--azul); font-weight: 700; }
+.pv-card-conteudo .acao-excluir { background: none; border: 0; color: var(--perigo-claro); font-weight: 700; }
+
+/* modal genérico (usado por Busca=editor de conteúdo e ModalIntensidade) */
+.pv-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50;
+}
+.pv-modal-overlay[hidden] { display: none; }
+.pv-modal {
+  width: 90%; max-width: 560px; background: var(--branco); border-radius: var(--radius-lg);
+  padding: 20px; max-height: 85vh; overflow-y: auto;
+}
+.pv-modal .modal-label { font-weight: 700; color: var(--azul); margin-top: 10px; display: block; }
+.pv-modal .modal-input {
+  width: 100%; font-family: var(--fonte-regular); border: 1px solid #CCC; border-radius: 8px;
+  padding: 10px; background: #FAFAFA; margin-bottom: 5px; font-size: 14px;
+}
+.pv-modal textarea.modal-input { min-height: 80px; resize: vertical; }
+.pv-modal .modal-botoes { display: flex; gap: 10px; margin-top: 20px; }
+.pv-modal .botao-modal { flex: 1; padding: 12px; border-radius: 8px; text-align: center; font-weight: 700; border: 0; }
+.pv-modal .botao-cancelar { border: 1px solid var(--perigo-claro); color: var(--perigo-claro); background: none; }
+.pv-modal .botao-salvar { background: var(--azul); color: var(--branco); }
+.pv-modal .botao-salvar[disabled] { opacity: 0.6; }
+
+/* ======================================================= Perfil (campos.tsx) === */
+.tela-perfil { background: var(--creme); padding: 16px; padding-bottom: 32px; flex: 1; }
+.tela-perfil .titulo { font-size: 28px; font-weight: 700; color: var(--azul); margin: 12px 0; }
+.pv-card { background: var(--branco); border-radius: 12px; padding: 14px; margin-bottom: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.pv-card .subtitulo { font-size: 20px; font-weight: 600; color: var(--azul); margin-bottom: 12px; }
+.pv-campo-label { font-size: 14px; color: var(--marrom); margin: 8px 0 6px; display: block; }
+.pv-campo-input, .pv-campo-select {
+  width: 100%; font-family: var(--fonte-regular); background: var(--azul-claro); color: var(--branco-quente);
+  border: 0; border-radius: 8px; padding: 10px; font-size: 14px;
+}
+.pv-campo-input::placeholder { color: var(--branco-quente); opacity: 0.85; }
+textarea.pv-campo-input { min-height: 90px; resize: vertical; }
+.pv-campo-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23FFF6E5'%3E%3Cpath d='M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+.pv-botao-primario, .pv-botao-secundario, .pv-botao-perigo, .pv-botao-logout {
+  margin-top: 16px; border: 0; border-radius: var(--radius-md); padding: 12px; width: 100%;
+  font-family: var(--fonte-bold); font-weight: 700; font-size: 16px; color: var(--branco-quente);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.pv-botao-primario { background: var(--destaque); }
+.pv-botao-secundario { background: var(--azul-medio); }
+.pv-botao-perigo { margin-top: 10px; background: var(--perigo); }
+.pv-botao-logout { background: var(--logout); color: var(--marrom); }
+.pv-item-vinculo { background: #F4F4F4; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+.pv-codigo-readonly { opacity: 0.8; }
+
+/* Wizard de preenchimento por etapas (mesmo sistema usado antes só na
+   Carteirinha) agora também é usado dentro do card "Seus dados" do
+   Prontuário — as classes .pv-carteirinha-* tinham padding lateral pensado
+   para ocupar a tela inteira; aqui elas ficam dentro de um .pv-card que já
+   tem o próprio padding, então o padding lateral extra é removido. */
+.pv-card .pv-carteirinha-progresso,
+.pv-card .pv-carteirinha-form,
+.pv-card .pv-carteirinha-nav {
+  padding-left: 0;
+  padding-right: 0;
+}
+.pv-card .pv-carteirinha-nav { padding-top: 14px; }
+
+/* ================================================== MenuSintomas / ListaSintomas ===
+   Reformulado para caber inteiro na tela (sem rolagem): o cabeçalho, o
+   título e a grade de sintomas dividem a altura disponível de .app-main
+   usando flex, e a grade usa "grid-auto-rows: 1fr" para que as linhas de
+   cartões se comprimam/expandam conforme o espaço restante, ao invés de
+   ter uma altura fixa que force scroll em telas menores. */
+.tela-menu-sintomas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--creme);
+  min-height: 0; /* permite que o flex item encolha dentro de .app-main */
+  overflow: hidden;
+  padding-bottom: 8px;
+  position: relative; /* ancora o painel de "sintomas de hoje" (position:absolute) dentro desta tela */
+}
+/* Cabeçalho da tela: título centralizado + ícone discreto de "sintomas de
+   hoje" ancorado à direita, sem disputar espaço visual com o título nem
+   com o header global do app (que já ocupa o canto superior esquerdo). */
+.pv-menu-sintomas-cabecalho {
+  position: relative;
+  flex-shrink: 0;
+}
+.tela-menu-sintomas .titulo {
+  font-size: clamp(18px, 5.5vw, 26px);
+  margin: 12px 0 10px;
+  text-align: center;
+  color: var(--azul);
+  padding: 0 44px;
+  line-height: 1.25;
+}
+.pv-botao-relatorio-hoje {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--azul-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+}
+.pv-botao-relatorio-hoje:active { opacity: 1; background: rgba(17,42,108,0.08); }
+#lista-sintomas-slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.pv-lista-sintomas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.pv-grade-sintomas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(6, 1fr);
+  gap: 8px;
+  padding: 0 12px;
+  flex: 1 1 0;
+  min-height: 0;
+}
+.pv-card-sintoma {
+  padding: 6px 8px;
+  border: 1px solid #444;
+  border-radius: 12px;
+  background: #F9F6EE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(11px, 3vw, 14px);
+  line-height: 1.2;
+  color: #333;
+  overflow: hidden;
+}
+.pv-botao-sem-sintoma {
+  background: var(--azul-botao); color: var(--branco); border: 0; border-radius: var(--radius-md);
+  padding: 10px; width: 90%; max-width: 320px; min-height: 44px; display: block;
+  margin: 10px auto; font-size: clamp(14px, 4vw, 18px); flex-shrink: 0;
+  box-shadow: 4px 4px 6px rgba(0,0,0,0.25);
+}
+
+/* ================================================================ PainelHoje ===
+   Painel deslizante (drawer) com os sintomas já registrados hoje, aberto
+   pelo ícone discreto no cabeçalho do Menu de Sintomas. Usa o mesmo padrão
+   visual de overlay escurecido dos demais modais do app (.pv-modal-overlay),
+   mas desliza da direita como uma gaveta em vez de aparecer centralizado,
+   para não competir com o modal de intensidade. */
+.pv-painel-hoje-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 40;
+  display: flex;
+  justify-content: flex-end;
+}
+.pv-painel-hoje-overlay[hidden] { display: none; }
+.pv-painel-hoje {
+  width: min(78%, 300px);
+  height: 100%;
+  background: var(--branco);
+  box-shadow: -6px 0 18px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  animation: pv-painel-hoje-entrar 0.18s ease-out;
+}
+@keyframes pv-painel-hoje-entrar {
+  from { transform: translateX(24px); opacity: 0.4; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.pv-painel-hoje-cabecalho {
+  background: var(--azul);
+  color: var(--branco);
+  padding: 14px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.pv-painel-hoje-cabecalho button {
+  background: none; border: 0; color: var(--branco); font-size: 22px; line-height: 1; padding: 0 4px;
+}
+.pv-painel-hoje-lista {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pv-painel-hoje-vazio {
+  font-size: 13px;
+  color: var(--marrom);
+  text-align: center;
+  margin-top: 24px;
+}
+.pv-painel-hoje-item {
+  background: var(--areia-clara, #F2E8D5);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.pv-painel-hoje-linha1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pv-painel-hoje-nome {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--marrom);
+}
+.pv-painel-hoje-nota {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--branco);
+  border-radius: 999px;
+  padding: 2px 9px;
+  flex-shrink: 0;
+}
+.pv-painel-hoje-hora {
+  font-size: 11px;
+  color: var(--marrom);
+  opacity: 0.75;
+  margin-top: 3px;
+}
+
+/* ============================================================ ModalIntensidade ===
+   Escala numérica de botões (0-10) substituída por uma barra de gradiente
+   arrastável (slider tipo "track" único, sem necessidade de clicar em
+   números pequenos nem de rolar a tela). O usuário toca/arrasta o polegar
+   (thumb) lateralmente sobre a barra para escolher um valor de 0 a 10. */
+.pv-modal-intensidade {
+  background: #F7F2ED; border-radius: 20px; padding: 18px 20px; width: 86%; max-width: 420px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.pv-modal-intensidade .titulo { font-weight: 700; font-size: 18px; text-align: center; margin-bottom: 6px; }
+.pv-modal-intensidade .sintoma { font-size: 14px; text-align: center; color: var(--marrom); margin-bottom: 18px; }
+
+.pv-slider-intensidade {
+  margin-bottom: 22px;
+  touch-action: none; /* evita scroll da página durante o arraste no mobile */
+  user-select: none;
+}
+.pv-slider-valor {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--azul);
+  margin-bottom: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.pv-slider-track {
+  position: relative;
+  height: 14px;
+  border-radius: var(--radius-pill);
+  /* gradiente contínuo do verde (leve) ao vermelho (intenso), a mesma
+     lógica de cores de alerta já usada no resto do app */
+  background: linear-gradient(90deg,
+    #9BC45A 0%,
+    #F1D359 35%,
+    #E8994B 60%,
+    #D63031 85%,
+    #A00000 100%);
+  cursor: pointer;
+}
+.pv-slider-thumb {
+  position: absolute;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--branco);
+  border: 3px solid var(--azul);
+  transform: translate(-50%, -50%);
+  left: 0%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  transition: left 0.05s linear;
+}
+.pv-slider-marcadores {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--marrom);
+  padding: 0 2px;
+}
+
+.pv-modal-intensidade .acoes { display: flex; justify-content: space-between; }
+.pv-modal-intensidade .botao { flex: 1; margin: 0 5px; border-radius: var(--radius-md); padding: 10px; border: 0; color: var(--branco); font-weight: 700; }
+.pv-modal-intensidade .confirmar { background: #59A87D; }
+.pv-modal-intensidade .cancelar { background: #D63031; }
+.pv-modal-intensidade .botao[disabled] { opacity: 0.6; }
+
+/* ==================================================== ConteudoDetalhe / DefinicaoSintomas === */
+.tela-conteudo-detalhe { flex: 1; background: var(--areia-clara); }
+.tela-conteudo-detalhe .cabecalho { padding: 0 20px; margin: 25px 0 20px; }
+.tela-conteudo-detalhe .titulo-principal { font-size: 26px; font-weight: 800; color: var(--azul); }
+.tela-conteudo-detalhe .barra-titulo { width: 60px; height: 4px; background: var(--laranja-escuro); margin-top: 8px; border-radius: 2px; }
+.tela-conteudo-detalhe .card {
+  background: var(--branco); width: 90%; margin: 0 auto 20px; padding: 25px 20px; border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.tela-conteudo-detalhe .borda-laranja { border-left: 5px solid var(--laranja-escuro); }
+.tela-conteudo-detalhe .borda-vermelha { border-left: 5px solid var(--perigo-claro); }
+.tela-conteudo-detalhe .label-secao { font-weight: 700; font-size: 18px; color: var(--azul); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.tela-conteudo-detalhe .texto-corpo { font-size: 16px; line-height: 26px; color: #444; margin-bottom: 15px; white-space: pre-line; }
+.tela-conteudo-detalhe .botao-laranja, .tela-conteudo-detalhe .botao-vermelho {
+  border: 0; padding: 14px 15px; border-radius: 8px; width: 100%; color: var(--branco); font-weight: 700;
+  font-size: 15px; text-transform: uppercase; margin-top: 5px;
+}
+.tela-conteudo-detalhe .botao-laranja { background: var(--laranja-escuro); }
+.tela-conteudo-detalhe .botao-vermelho { background: var(--perigo-claro); }
+.tela-conteudo-detalhe .botao-voltar {
+  margin: 10px auto 0; display: block; padding: 10px 30px; border-radius: var(--radius-pill);
+  border: 1px solid var(--azul); background: none; color: var(--azul); font-weight: 600; font-size: 16px;
+}
+.tela-conteudo-detalhe .link-leitura-facil {
+  display: block; text-align: center; margin: 0 auto 20px; color: var(--azul-medio); text-decoration: underline;
+  font-size: 14px; background: none; border: 0;
+}
+
+.tela-definicao { background: var(--areia); }
+.tela-definicao .conteudo { padding: 40px 20px; }
+.tela-definicao .titulo { font-weight: 700; font-size: 32px; color: var(--azul); text-align: center; }
+.tela-definicao .sublinhado { height: 3px; background: var(--branco); width: 100%; margin: 20px 0; }
+.tela-definicao .titulo-definicao { font-weight: 700; font-size: 24px; color: var(--azul); margin-bottom: 20px; }
+.tela-definicao .titulo-definicao .peso-normal { font-weight: 400; }
+.tela-definicao .secao { margin-bottom: 10px; }
+.tela-definicao .titulo-secao { font-weight: 700; font-size: 24px; color: #000; line-height: 35px; }
+.tela-definicao .texto-secao { font-size: 24px; color: #000; line-height: 35px; white-space: pre-line; }
+.tela-definicao .botao-laranja, .tela-definicao .botao-vermelho {
+  border: 0; border-radius: 16px; padding: 16px 8px; display: block; width: 290px; min-height: 67px;
+  margin: 20px auto; color: var(--branco); font-weight: 700; font-size: 20px; text-align: center; white-space: pre-line;
+}
+.tela-definicao .botao-laranja { background: var(--laranja); }
+.tela-definicao .botao-vermelho { background: var(--vermelho); margin-top: 20px; }
+
+/* ===================================================================== TelaSinal === */
+.tela-sinal { flex: 1; display: flex; flex-direction: column; }
+.tela-sinal .conteudo-scroll { padding: 0 20px 40px; display: flex; flex-direction: column; align-items: center; flex: 1; }
+.tela-sinal .aviso-topo {
+  width: 100%; margin: 40px 0; padding: 30px; background: var(--branco); font-weight: 700; font-size: 28px;
+  border-radius: var(--radius-md); text-align: center;
+}
+.tela-sinal .card { width: 100%; padding: 25px; background: var(--branco); border-radius: var(--radius-md); margin-bottom: 30px; }
+.tela-sinal .titulo { font-size: 26px; text-align: center; margin-bottom: 20px; color: var(--cinza); font-weight: 700; }
+.tela-sinal .descricao { text-align: center; font-size: 20px; line-height: 28px; color: var(--cinza); }
+.tela-sinal .botao-voltar {
+  width: 100%; background: var(--branco); border: 0; padding: 14px; border-radius: var(--radius-md);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2); color: var(--cinza); font-size: 20px; font-weight: 700; text-align: center;
+}
+
+/* ================================================================ DashboardAdmin === */
+.tela-dashboard { flex: 1; background: var(--areia); display: flex; flex-direction: column; }
+.tela-dashboard .titulo { font-weight: 700; font-size: 28px; margin: 20px 0; text-align: center; color: var(--azul); }
+.tela-dashboard .erro-texto { text-align: center; margin-bottom: 10px; color: var(--erro-texto); }
+.tela-dashboard .vazio { background: var(--branco); padding: 16px; margin: 10px; border-radius: var(--radius-md); text-align: center; color: var(--azul); }
+
+.pv-card-grafico {
+  width: 90%; margin: 0 auto 20px; background: var(--branco); padding: 16px; border-radius: var(--radius-lg);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.pv-card-grafico .titulo-grafico { font-weight: 700; font-size: 18px; color: var(--azul); margin-bottom: 15px; text-align: center; }
+.pv-grafico-barras { height: 200px; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 10px; gap: 4px; }
+.pv-grafico-coluna-wrap { flex: 1; display: flex; align-items: flex-end; justify-content: center; height: 100%; }
+.pv-grafico-coluna { width: 24px; border-radius: 6px 6px 0 0; transition: height 0.4s ease; }
+.pv-legenda { margin-top: 15px; padding-top: 10px; border-top: 1px solid #F0F0F0; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+.pv-legenda-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--cinza-claro); }
+.pv-legenda-cor { width: 10px; height: 10px; border-radius: 5px; flex-shrink: 0; }
+.pv-legenda-item b { color: #333; }
+
+.pv-gerenciador { width: 90%; margin: 10px auto 30px; background: var(--branco); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.pv-gerenciador .botao-expandir { width: 100%; padding: 16px; background: var(--azul-medio); border: 0; color: var(--branco-quente); font-weight: 700; font-size: 16px; }
+.pv-gerenciador .painel { padding: 14px; }
+.pv-gerenciador .subtitulo { font-weight: 700; font-size: 16px; color: var(--azul); margin: 8px 0 12px; }
+.pv-gerenciador .item-sintoma {
+  display: flex; justify-content: space-between; align-items: center; padding: 12px 10px;
+  background: #F4F4F4; border-radius: 8px; margin-bottom: 8px;
+}
+.pv-gerenciador .nome-sintoma { font-size: 14px; color: var(--marrom); flex: 1; }
+.pv-gerenciador .botao-remover { background: var(--perigo); border: 0; color: var(--branco-quente); font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 8px; }
+.pv-gerenciador .ver-mais { display: block; width: 100%; background: none; border: 0; color: var(--azul-medio); text-align: center; margin-top: 12px; text-decoration: underline; font-size: 14px; }
+.pv-gerenciador .input-sintoma { width: 100%; background: #F4F4F4; border: 0; border-radius: 8px; padding: 12px 10px; margin-bottom: 12px; font-size: 14px; color: var(--marrom); }
+.pv-gerenciador .botao-adicionar { width: 100%; background: var(--azul-claro); border: 0; padding: 14px; border-radius: var(--radius-md); color: var(--branco-quente); font-weight: 700; font-size: 16px; }
+
+/* ================================================================== PainelAdmin === */
+.tela-painel-admin {
+  flex: 1; background: var(--azul); padding: 20px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+}
+.tela-painel-admin .titulo { font-weight: 700; font-size: 32px; color: #FDEDD3; margin-bottom: 10px; }
+.tela-painel-admin .subtitulo { font-size: 18px; color: #FDEDD3; margin-bottom: 40px; }
+.tela-painel-admin .conteudo { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; gap: 12px; }
+.tela-painel-admin .botao {
+  background: var(--azul-medio); padding: 15px; border-radius: 8px; width: 100%; max-width: 420px;
+  border: 0; color: #FDEDD3; font-weight: 700; font-size: 16px;
+}
+.tela-painel-admin .botao-sair { background: var(--perigo); padding: 15px; border-radius: 8px; width: 100%; max-width: 420px; border: 0; color: #FDEDD3; font-weight: 700; font-size: 16px; margin-top: 20px; }
+
+/* ============================================================= utilidades gerais === */
+.pv-oculto { display: none !important; }
+.pv-barra-topo-espaco { padding: 0 16px; }
+.pv-toast-reset {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+  background: #1F2937; color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 13px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3); z-index: 100;
+}
+
+/* ========================================================= Triagem === */
+/* Porta das telas de triagem de sintomas / carteirinha / laudo digital do
+   Portal Clínico — restilizada para o app-shell de telefone, reaproveitando
+   as variáveis de cor e os componentes (.pv-card, .botao-enviar, .campo...)
+   já usados no restante do site. */
+.tela-triagem { flex: 1; background: var(--areia-clara); padding: 0 0 24px; }
+.tela-triagem .titulo { font-size: 24px; font-weight: 700; color: var(--azul); text-align: center; margin: 20px 16px 6px; }
+.tela-triagem .subtitulo { font-size: 14px; color: var(--marrom); text-align: center; margin: 0 20px 16px; }
+
+.pv-triagem-intro { padding-top: 4px; }
+.pv-triagem-busca-wrap {
+  display: flex; align-items: center; gap: 8px; background: var(--branco); border-radius: var(--radius-pill);
+  padding: 4px 6px 4px 16px; margin: 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.pv-triagem-busca { flex: 1; border: 0; background: none; padding: 10px 0; font-size: 15px; color: var(--azul); font-family: var(--fonte-regular); }
+.pv-triagem-busca:focus { outline: none; }
+.pv-triagem-mic {
+  width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--azul-claro);
+  color: var(--branco); flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.pv-triagem-mic svg { display: block; }
+.pv-triagem-mic.gravando { background: var(--vermelho); animation: girar-mic 1s ease infinite alternate; }
+@keyframes girar-mic { from { opacity: 1; } to { opacity: 0.5; } }
+
+/* bolinha de legenda do medidor de nível de atenção (substitui os emojis 🟢🟡🔴) */
+.pv-triagem-legendas span { display: inline-flex; align-items: center; gap: 4px; }
+.pv-ponto { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: currentColor; }
+
+.pv-triagem-sugestoes {
+  list-style: none; margin: 6px 16px 0; padding: 6px; background: var(--branco); border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15); max-height: 220px; overflow-y: auto;
+}
+.pv-triagem-sugestoes li {
+  display: flex; justify-content: space-between; align-items: center; padding: 10px 8px; font-size: 13px;
+  color: var(--marrom); border-bottom: 1px solid var(--areia-clara);
+}
+.pv-triagem-sugestoes li:last-child { border-bottom: 0; }
+.pv-triagem-tag { font-size: 10px; text-transform: uppercase; color: var(--azul-medio); font-weight: 700; }
+
+/* medidor de nível de atenção */
+.pv-triagem-medidor { margin: 16px 16px 0; background: var(--branco); border-radius: var(--radius-lg); padding: 14px 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.pv-triagem-medidor-cabecalho { display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: var(--azul); font-size: 15px; margin-bottom: 10px; }
+.pv-triagem-limpar { background: none; border: 0; font-size: 12px; color: var(--azul-medio); text-decoration: underline; }
+.pv-triagem-barra-fundo { position: relative; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--verde), var(--amarelo), var(--vermelho)); margin-bottom: 6px; }
+.pv-triagem-barra-indicador { position: absolute; top: -4px; width: 16px; height: 16px; border-radius: 50%; background: var(--branco); border: 3px solid var(--azul); transform: translateX(-50%); transition: left 0.3s ease; }
+.pv-triagem-legendas { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--cinza-claro); margin-bottom: 10px; }
+.pv-triagem-banner { border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; text-align: center; }
+.pv-triagem-banner.verde { background: var(--sucesso-fundo); color: #065F46; }
+.pv-triagem-banner.amarelo { background: #FFF6DA; color: #7A5B00; }
+.pv-triagem-banner.vermelho { background: var(--erro-fundo); color: var(--erro-texto); }
+
+/* lista de cards acordeão */
+.pv-triagem-lista { display: flex; flex-direction: column; gap: 12px; padding: 12px 16px 0; }
+.pv-triagem-card { background: var(--branco); border-radius: var(--radius-lg); box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; scroll-margin-top: 12px; }
+.pv-triagem-cabecalho { width: 100%; display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: none; border: 0; text-align: left; }
+.pv-triagem-titulo { flex: 1; font-weight: 700; color: var(--azul); font-size: 15px; }
+.pv-triagem-seta { font-size: 11px; color: var(--cinza-claro); transition: transform 0.2s ease; }
+.pv-triagem-card.aberto .pv-triagem-seta { transform: rotate(180deg); }
+.pv-triagem-corpo { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; padding: 0 16px; }
+.pv-triagem-card.aberto .pv-triagem-corpo { max-height: 2000px; padding: 0 16px 16px; }
+.pv-triagem-definicao { font-size: 13px; line-height: 20px; color: #444; margin-bottom: 10px; }
+.pv-triagem-rotulo { font-size: 12px; font-weight: 700; color: var(--azul); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+.pv-triagem-rotulo.alerta { color: var(--perigo-claro); margin-top: 14px; }
+.pv-triagem-grade { display: flex; flex-direction: column; gap: 6px; }
+.pv-triagem-check {
+  display: flex; align-items: center; gap: 8px; font-size: 13px; color: #333; background: var(--areia-clara);
+  border-radius: 8px; padding: 8px 10px;
+}
+.pv-triagem-check.selecionado { background: #E4F0E9; color: #1C5A3A; font-weight: 700; }
+.pv-triagem-check.selecionado.alerta { background: var(--erro-fundo); color: var(--erro-texto); }
+.pv-triagem-alerta-secao { margin-top: 6px; }
+.pv-triagem-refs { margin-top: 12px; font-size: 12px; color: var(--cinza-claro); }
+.pv-triagem-refs summary { cursor: pointer; font-weight: 700; }
+.pv-triagem-refs ul { margin: 8px 0 0; padding-left: 18px; }
+.pv-triagem-refs li { margin-bottom: 6px; }
+
+.pv-triagem-links { display: flex; flex-direction: column; gap: 10px; padding: 20px 16px 0; }
+.pv-triagem-link {
+  background: var(--azul-medio); color: var(--branco-quente); border: 0; border-radius: var(--radius-md);
+  padding: 14px; font-size: 14px; font-weight: 700;
+}
+
+/* =================================================== Carteirinha (wizard) === */
+.tela-carteirinha { flex: 1; background: var(--creme); padding: 0 0 24px; }
+.tela-carteirinha .titulo { font-size: 22px; font-weight: 700; color: var(--azul); text-align: center; margin: 20px 16px 6px; }
+.tela-carteirinha .subtitulo { font-size: 13px; color: var(--marrom); text-align: center; margin: 0 20px 16px; }
+
+.pv-carteirinha-aviso {
+  margin: 0 16px 16px; background: #FFF6DA; border: 1px solid var(--amarelo); border-radius: var(--radius-md);
+  padding: 12px 14px; font-size: 12px; color: #7A5B00; line-height: 18px;
+}
+.pv-carteirinha-aviso strong { display: block; margin-bottom: 4px; }
+
+.pv-carteirinha-progresso { padding: 0 16px; margin-bottom: 16px; }
+.pv-carteirinha-progresso-barra { height: 6px; border-radius: 999px; background: var(--areia); overflow: hidden; margin-bottom: 6px; }
+.pv-carteirinha-progresso-barra div { height: 100%; background: var(--azul); transition: width 0.3s ease; }
+.pv-carteirinha-progresso span { font-size: 12px; color: var(--marrom); }
+
+.pv-carteirinha-form { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+.pv-carteirinha-campo .campo-label { font-size: 13px; color: var(--marrom); font-weight: 700; margin-bottom: 4px; display: block; }
+.pv-carteirinha-campo .campo {
+  width: 100%; padding: 10px 14px; background: var(--azul-claro); color: var(--branco); border: 0;
+  border-radius: var(--radius-md); font-size: 14px; height: 46px; font-family: var(--fonte-regular);
+}
+.pv-carteirinha-campo textarea.campo { height: 80px; padding-top: 10px; resize: vertical; }
+.pv-carteirinha-campo .campo::placeholder { color: var(--branco-quente); }
+
+.pv-carteirinha-nav { display: flex; gap: 10px; padding: 18px 16px 0; }
+.pv-carteirinha-nav .botao-voltar, .pv-carteirinha-nav .botao-enviar { flex: 1; margin: 0; }
+
+.tela-carteirinha .botao-enviar {
+  background: var(--azul-medio); color: var(--branco-quente); border: 0; padding: 14px; border-radius: var(--radius-md);
+  font-size: 14px; font-weight: 700;
+}
+.tela-carteirinha .botao-voltar {
+  background: var(--branco); color: var(--cinza); border: 0; padding: 14px; border-radius: var(--radius-md);
+  font-size: 14px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.pv-carteirinha-card {
+  margin: 0 16px; background: var(--branco); border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15); border: 1px solid var(--areia);
+}
+.pv-carteirinha-card .topo { background: var(--azul); color: var(--branco); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+.pv-carteirinha-card .marca span { font-weight: 700; font-size: 16px; display: block; }
+.pv-carteirinha-card .marca small { font-size: 10px; opacity: 0.8; }
+.pv-carteirinha-card .selo { font-size: 10px; font-weight: 700; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 999px; }
+.pv-carteirinha-card .linhas { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.pv-carteirinha-card .linha { display: flex; flex-direction: column; gap: 2px; font-size: 13px; border-bottom: 1px dashed var(--areia); padding-bottom: 8px; }
+.pv-carteirinha-card .linha:last-child { border-bottom: 0; }
+.pv-carteirinha-card .rotulo { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--cinza-claro); font-weight: 700; }
+.pv-carteirinha-card .linha.destaque span:last-child { font-size: 16px; font-weight: 700; color: var(--azul); }
+.pv-carteirinha-card .linha.alerta span:last-child { color: var(--perigo-claro); font-weight: 700; }
+.pv-carteirinha-card .linha.alerta-forte span:last-child { color: var(--erro-texto); font-weight: 700; background: var(--erro-fundo); padding: 4px 6px; border-radius: 6px; }
+.pv-carteirinha-card .rodape-doc { background: var(--areia-clara); color: var(--marrom); font-size: 10px; text-align: center; padding: 10px; }
+
+.pv-carteirinha-acoes { display: flex; gap: 10px; padding: 16px 16px 0; }
+.pv-carteirinha-acoes button { flex: 1; margin: 0; }
+
+@media print {
+  .pv-header, .pv-footer, .pv-tabbar, .pv-carteirinha-acoes { display: none !important; }
+}
+
+/* ==================================================== Laudo digital (PDF) === */
+.tela-laudo { flex: 1; background: var(--areia-clara); padding: 0 0 24px; }
+.tela-laudo .titulo { font-size: 22px; font-weight: 700; color: var(--azul); text-align: center; margin: 20px 16px 6px; }
+.tela-laudo .subtitulo { font-size: 13px; color: var(--marrom); text-align: center; margin: 0 20px 20px; }
+
+.pv-laudo-card { margin: 0 16px 16px; background: var(--branco); border-radius: var(--radius-lg); padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+.pv-laudo-info h3 { font-size: 15px; color: var(--azul); margin-bottom: 6px; }
+.pv-laudo-info p { font-size: 12px; color: var(--marrom); margin-bottom: 14px; }
+.pv-laudo-botao-upload {
+  display: inline-block; background: var(--azul-medio); color: var(--branco-quente); padding: 12px 20px;
+  border-radius: var(--radius-md); font-size: 13px; font-weight: 700; cursor: pointer;
+}
+
+.pv-laudo-visualizador { margin: 0 16px; background: var(--branco); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.pv-laudo-visualizador-cabecalho { padding: 14px 16px 0; }
+.pv-laudo-visualizador-cabecalho h4 { font-size: 14px; color: var(--azul); margin-bottom: 6px; }
+.pv-laudo-aviso-mobile { font-size: 11px; color: var(--cinza-claro); margin-bottom: 10px; }
+.pv-laudo-acoes { display: flex; gap: 8px; padding: 0 16px 14px; }
+.pv-laudo-acoes button { flex: 1; margin: 0; padding: 10px; font-size: 12px; }
+.pv-laudo-frame-wrap { height: 360px; border-top: 1px solid var(--areia); }
+.pv-laudo-frame-wrap iframe { width: 100%; height: 100%; border: 0; }
+
+.tela-laudo .botao-voltar { margin: 20px 16px 0; width: calc(100% - 32px); background: var(--branco); color: var(--cinza); border: 0; padding: 14px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+
+/* rodapé "sobre este site" fixo, discreto, dentro da tela de login */
+.pv-nota-demo {
+  margin-top: 28px; width: 260px; text-align: center; font-size: 11px; line-height: 16px;
+  color: var(--marrom); opacity: 0.75;
+}
+.pv-nota-demo button { background: none; border: 0; padding: 0; color: var(--azul-medio); text-decoration: underline; font-size: 11px; }
