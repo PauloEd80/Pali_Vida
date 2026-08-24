@@ -149,13 +149,13 @@ window.PV.screens = window.PV.screens || {};
       let nivel, texto;
       if (selecionadosAlerta.size > 0 || selecionados.size >= 6) {
         nivel = 'vermelho';
-        texto = '<strong>Atenção:</strong> sinais de alerta identificados. Contate a equipe de saúde.';
+        texto = '<strong>Atenção:</strong> sinais de alerta identificados. Identificamos que você possui sinais e sintomas que requerem avaliação médica. Busque orientação e atendimento médico';
       } else if (selecionados.size >= 3) {
         nivel = 'amarelo';
-        texto = '<strong>Observação:</strong> múltiplos sintomas. Relate na próxima consulta.';
+        texto = '<strong>Observação:</strong> múltiplos sintomas. Identificamos que você possui sinais e sintomas que requerem avaliação médica. Busque orientação e atendimento médico';
       } else {
         nivel = 'verde';
-        texto = '<strong>Controle:</strong> sintomas isolados. Siga as orientações já recebidas.';
+        texto = '<strong>Controle:</strong> Identificamos que você possui sinais e sintomas que requerem avaliação médica. Busque orientação e atendimento médico';
       }
 
       return `
