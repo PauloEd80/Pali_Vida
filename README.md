@@ -1,4 +1,4 @@
-# PaliVida — armazenamento em Google Sheets (`conteudos` e `sintomas`)
+# PaliVida
 
 Este diretório documenta e versiona o script (`Code.gs`) que roda dentro de
 uma planilha do Google Sheets e serve como "backend" HTTP para as entidades
