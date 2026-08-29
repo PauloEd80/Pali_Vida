@@ -2,9 +2,10 @@
  * Dados de demonstração do PaliVida.
  *
  * Espelham o app publicado: os 12 sintomas oficiais, os conteúdos educativos
- * completos (definição, sinais e sintomas, sinais de alerta — extraídos do
- * documento DEFINIÇÃO_FINALIZADO_280826) e os 3 usuários de teste (senha
- * "palivida123" para todos). Isso alimenta o "banco" em js/db.js.
+ * completos (definição, sinais e sintomas, sinais de alerta e referências
+ * bibliográficas — extraídos do documento DEFINIÇÃO_FINALIZADO_280826) e os 3
+ * usuários de teste (senha "palivida123" para todos). Isso alimenta o "banco"
+ * em js/db.js.
  */
 window.PALIVIDA_SEED = {
   sintomas: [
@@ -45,6 +46,10 @@ window.PALIVIDA_SEED = {
         'Anemia ferropriva inexplicável',
         'História familiar de câncer de cólon',
       ].join('\n'),
+      referencias: [
+        'OLIVEIRA, Adriana dos Santos; LOPES, Carlos Daniel Dutra; AZEVEDO, Ellen Mendes; SILVA, Gabriela Moreira da; STEFANINE, Nadia Regina; PEREIRA, Mariana Gomes; GARCIA, Mariel Henrique da Costa; DIAS, Sara Batista Andrade; QUEIROZ, Tony Souza (Org.). Sinais e sintomas na clínica médica. Palmas, TO: Unitins, 2024. Acesso em: 21 jan. 2025.',
+        'TIMERMAN, Sergio. Emergências Médicas - Passo a Passo. Rio de Janeiro: Guanabara Koogan, 2019. E-book. p.284. ISBN 9788527736107. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9788527736107/. Acesso em: 21 jan. 2025.',
+      ],
     },
     {
       titulo: 'Fraqueza',
@@ -62,6 +67,11 @@ window.PALIVIDA_SEED = {
         'Fraqueza muscular intensa e redução da funcionalidade',
         'Sonolência a maior parte do tempo',
       ].join('\n'),
+      referencias: [
+        'Instituto Nacional de Câncer (Brasil). Últimos dias de vida / Instituto Nacional de Câncer. -- Rio de Janeiro: INCA, 2023.',
+        'SILVA, Eneida R R.; LUCENA, Amália F. Diagnóstico de enfermagem com base em sinais e sintomas . Porto Alegre: ArtMed, 2011. E-book. pág.202. ISBN 9788536326511. Disponível em: https://app.minhabiblioteca.com.br/reader/books/9788536326511/. Acesso em: 28 abr. 2026.',
+        'CARVALHO, Ricardo Tavares de; PARSONS, Henrique Afonseca (org.). Manual de cuidados paliativos. 2. ed. São Paulo: Academia Nacional de Cuidados Paliativos (ANCP), 2012.',
+      ],
     },
     {
       titulo: 'Sonolência',
@@ -96,6 +106,14 @@ window.PALIVIDA_SEED = {
         'Torpor',
         'Coma',
       ].join('\n'),
+      referencias: [
+        'CARVALHO, Ricardo Tavares de; PARSONS, Henrique Afonseca (org.). Manual de cuidados paliativos. 2. ed. São Paulo: Academia Nacional de Cuidados Paliativos (ANCP), 2012.',
+        'BARBOSA, Sara Machado Miranda Leal et al. Prevalência de sonolência diurna excessiva e fatores associados em adolescentes da coorte RPS, em São Luís (MA). Revista Brasileira de Epidemiologia, v. 23, e200071, 2020. DOI: 10.1590/1980-549720200071.',
+        'BITTENCOURT, Lia Rita Azeredo; SILVA, Rogério Santos; SANTOS, Ruth Ferreira; PIRES, Maria Laura Nogueira; MELLO, Marco Túlio de. Sonolência excessiva. Revista Brasileira de Psiquiatria, São Paulo, v. 27, supl. 1, p. 16-21, 2005.',
+        'SILVA, Eneida R R.; LUCENA, Amália F. Diagnosticos de enfermagem com base em sinais e sintomas. Porto Alegre: ArtMed, 2011. E-book. p.74. ISBN 9788536326511. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9788536326511/. Acesso em: 21 jan. 2025.',
+        'Manual de cuidados paliativos / Maria Perez Soares D\'Alessandro (ed.) ... [et al.]. -- 2. ed. São Paulo: Hospital Sírio-Libanês; Ministério da Saúde, 2023',
+        'Instituto Nacional de Câncer (Brasil). Últimos dias de vida / Instituto Nacional de Câncer. -- Rio de Janeiro: INCA, 2023',
+      ],
     },
     {
       titulo: 'Tristeza (Depressão)',
@@ -123,6 +141,10 @@ window.PALIVIDA_SEED = {
         'Desorganização',
         'Ideação ou tentativa suicida (Risco imediato de a pessoa se machucar ou colocar sua segurança em perigo.)',
       ].join('\n'),
+      referencias: [
+        'NUNES, Maria do Patrocínio T. D&T InforMed Clínica Médica: diagnóstico e tratamento em minutos. Barueri: Manole, 2024. E-book. p.iv. ISBN 9788520465479. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9788520465479/. Acesso em: 21 jan. 2025.',
+        'TIMERMAN, Sergio. Emergências Médicas - Passo a Passo. Rio de Janeiro: Guanabara Koogan, 2019. E-book. p.416. ISBN 9788527736107. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9788527736107/. Acesso em: 21 jan. 2025.',
+      ],
     },
     {
       titulo: 'Ansiedade',
@@ -148,6 +170,9 @@ window.PALIVIDA_SEED = {
         'Associação ao uso abusivo, grave, de substâncias (medicamentos, álcool, drogas, entre outras)',
         'Ideação ou tentativa suicida (Risco imediato de a pessoa se machucar ou colocar sua segurança em perigo.)',
       ].join('\n'),
+      referencias: [
+        'NUNES, Maria do Patrocínio T. D&T InforMed Clínica Médica: diagnóstico e tratamento em minutos. Barueri: Manole, 2024. E-book. p.iv. ISBN 9788520465479. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9788520465479/. Acesso em: 21 jan. 2025.',
+      ],
     },
     {
       titulo: 'Dor',
@@ -181,6 +206,13 @@ window.PALIVIDA_SEED = {
         'Dor abdominal de inicio recente',
         'Alterações de humor e de comportamento',
       ].join('\n'),
+      referencias: [
+        'OLIVEIRA, Adriana dos Santos; LOPES, Carlos Daniel Dutra; AZEVEDO, Ellen Mendes; SILVA, Gabriela Moreira da; STEFANINE, Nadia Regina; PEREIRA, Mariana Gomes; GARCIA, Mariel Henrique da Costa; DIAS, Sara Batista Andrade; QUEIROZ, Tony Souza (Org.). Sinais e sintomas na clínica médica. Palmas, TO: Unitins, 2024. Acesso em: 21 jan. 2025.',
+        'Manual de avaliação e tratamento da dor / Mauro Araújo (Org.). -- Belém : EDUEPA, 2020. 112 p. : il.',
+        'CARVALHO, Ricardo Tavares de; PARSONS, Henrique Afonseca (org.). Manual de cuidados paliativos. 2. ed. São Paulo: Academia Nacional de Cuidados Paliativos (ANCP), 2012.',
+        'COSTA, Ribeiro, Sabrina Corrêa da; CHAGA, Barrioso, Paula D.; DUTRA, Kreling, Gabriel A.; GALV. Manual de cuidados paliativos na prática . Barueri: Manole, 2026. E-book. pág.IV. ISBN 9788520457375. Disponível em: https://app.minhabiblioteca.com.br/reader/books/9788520457375/. Acesso em: 26 abr. 2026.',
+        'SILVA, Eneida R R.; LUCENA, Amália F. Diagnóstico de enfermagem com base em sinais e sintomas . Porto Alegre: ArtMed, 2011. E-book. pág.294. ISBN 9788536326511. Disponível em: https://app.minhabiblioteca.com.br/reader/books/9788536326511/. Acesso em: 26 abr. 2026.',
+      ],
     },
     {
       titulo: 'Náusea e Vômitos',
@@ -205,6 +237,10 @@ window.PALIVIDA_SEED = {
         'Sinais de instabilidade hemodinâmica',
         'Desidratação',
       ].join('\n'),
+      referencias: [
+        'RIBEIRO, Sabrina Corrêa da C. Cuidados paliativos no paciente crítico. 2. ed. Barueri: Manole, 2023. E-book. p.443. ISBN 9786555768824. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9786555768824/. Acesso em: 21 jan. 2025.',
+        'TIMERMAN, Sergio. Emergências Médicas - Passo a Passo. Rio de Janeiro: Guanabara Koogan, 2019. E-book. p.282. ISBN 9788527736107. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9788527736107/. Acesso em: 21 jan. 2025.',
+      ],
     },
     {
       titulo: 'Dispneia (Falta de ar)',
@@ -233,6 +269,12 @@ window.PALIVIDA_SEED = {
         'Falta de ar ao falar ou dificuldade para respirar, com sinais de cansaço ou exaustão;',
         'Respiração muito profunda, com suspiros frequentes, ou muito fraca, superficial e com pausas.',
       ].join('\n'),
+      referencias: [
+        'Berliner D, Schneider N, Welte T, Bauersachs J. The Differential Diagnosis of Dyspnea. Dtsch Arztebl Int. 2016 Dec 9;113(49):834-845. doi: 10.3238/arztebl.2016.0834. PMID: 28098068; PMCID: PMC5247680.',
+        'COSTA, Ribeiro, Sabrina Corrêa da; CHAGA, Barrioso, Paula D.; DUTRA, Kreling, Gabriel A.; GALV. Manual de cuidados paliativos na prática . Barueri: Manole, 2026. E-book. pág.IV. ISBN 9788520457375. Disponível em: https://app.minhabiblioteca.com.br/reader/books/9788520457375/. Acesso em: 26 abr. 2026.',
+        'RIBEIRO, Sabrina Corrêa da C. Cuidados paliativos no paciente crítico. 2. ed. Barueri: Manole, 2023. E-book. p.443. ISBN 9786555768824. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9786555768824/. Acesso em: 21 jan. 2025.',
+        'CARVALHO, Ricardo Tavares de; PARSONS, Henrique Afonseca (org.). Manual de cuidados paliativos. 2. ed. São Paulo: Academia Nacional de Cuidados Paliativos (ANCP), 2012.',
+      ],
     },
     {
       titulo: 'Fadiga e Cansaço',
@@ -264,6 +306,12 @@ window.PALIVIDA_SEED = {
         'Palidez',
         'Alteração de Sinais Vitais',
       ].join('\n'),
+      referencias: [
+        'RIBEIRO, Sabrina Corrêa da C. Cuidados paliativos no paciente crítico. 2. ed. Barueri: Manole, 2023. E-book. p.315. ISBN 9786555768824. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9786555768824/. Acesso em: 21 jan. 2025.',
+        'CARVALHO, Ricardo Tavares de; PARSONS, Henrique Afonseca (org.). Manual de cuidados paliativos. 2. ed. São Paulo: Academia Nacional de Cuidados Paliativos (ANCP), 2012.',
+        'SOCIEDADE BRASILEIRA DE ONCOLOGIA CLÍNICA (SBOC). Manual de tratamento sintomático em cuidados paliativos. 2. ed. São Paulo: SBOC, 2025.',
+        'Sinais e sintomas na clínica médica (livro eletrônico)/ Organizado por: Adriana dos Santos Oliveira, Carlos Daniel Dutra Lopes, Ellen Mendes Azevedo, Gabriela Moreira da Silva, Nadia Regina Stefanine, Mariana Gomes Pereira, Mariel Henrique da Costa Garcia, Sara Batista Andrade Dias, Tony Souza Queiroz -- Palmas TO: Unitins, 2024',
+      ],
     },
     {
       titulo: 'Xerostomia (Boca seca)',
@@ -290,6 +338,12 @@ window.PALIVIDA_SEED = {
         'Ressecamento de mucosas e peles',
         'Ressecamento de aparelho respiratório, faringe, fossas nasais e garganta',
       ].join('\n'),
+      referencias: [
+        'RIBEIRO, Sabrina Corrêa da C. Cuidados paliativos no paciente crítico. 2. ed. Barueri: Manole, 2023. E-book. p.484. ISBN 9786555768824. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9786555768824/. Acesso em: 21 jan. 2025.',
+        'CARVALHO, Ricardo Tavares de; PARSONS, Henrique Afonseca (org.). Manual de cuidados paliativos. 2. ed. São Paulo: Academia Nacional de Cuidados Paliativos (ANCP), 2012.',
+        'Xerostomia ou boca seca? [livro eletrônico]: saiba como diagnosticar e como tratar / Bianca Padilha Campanha L. Pinheiro...[et al.] ; coordenação Juliana Mariano Massuia Vizoto. -- 1. ed. -- Londrina, PR : Ed. das Autoras, 2022.',
+        'FEIO, Madalena; SAPETA, Paula. Xerostomia em cuidados paliativos. Acta Médica Portuguesa, Lisboa, v. 18, n. 6, p. 459-466, 2005. Disponível em: https://www.actamedicaportuguesa.com/revista/index.php/amp/article/view/1064. Acesso em: 27 abr. 2026',
+      ],
     },
     {
       titulo: 'Bem Estar',
@@ -312,6 +366,13 @@ window.PALIVIDA_SEED = {
       sinaisalerta: [
         'Declínio importante do estado funcional, qualidade de vida, saúde mental e sentido da vida',
       ].join('\n'),
+      referencias: [
+        'PONTE, Ana Carolina Silva L. C.; PAIS-RIBEIRO, José Luís. O bem-estar em cuidados paliativos: perspectiva do doente versus profissionais de saúde. Psicologia, Saúde e Doenças, Lisboa, v. 15, n. 1, p. 138-154, 2014.',
+        'JOHNSON, indefinido M. Ligações NANDA NOC - NIC . 3.ed. Rio de Janeiro: GEN Guanabara Koogan, 2012. E-book. pág.137. ISBN 9788595151697. Disponível em: https://app.minhabiblioteca.com.br/reader/books/9788595151697/. Acesso em: 28 abr. 2026.',
+        'MELO, Rômulo Lustosa Pimenteira de; EULÁLIO, Maria do Carmo; SILVA, Hermesson Daniel Medeiros da; SILVA FILHO, José Marcos da; GONZAGA, Pamela de Sousa. Sentido de vida, dependência funcional e qualidade de vida em idosos. Revista Brasileira de Geriatria e Gerontologia, Rio de Janeiro, v. 16, n. 2, p. 239-250, 2013. DOI: https://doi.org/10.1590/S1809-98232013000200004.',
+        'AFTAB, A.; LEE, E. E.; KLAUS, F.; DALY, R.; WU, T. C.; TU, X.; HUEGE, S.; JESTE, D. V. Meaning in life and its relationship with physical, mental, and cognitive functioning: a study of 1,042 community-dwelling adults across the lifespan. The Journal of Clinical Psychiatry, v. 81, n. 1, 2019. DOI: 10.4088/JCP.19m13064.',
+        'ORGANIZAÇÃO MUNDIAL DA SAÚDE. WHOQOL-100: versão em português. Coordenação do Grupo WHOQOL no Brasil: Marcelo Pio de Almeida Fleck. Porto Alegre: Universidade Federal do Rio Grande do Sul.',
+      ],
     },
     {
       titulo: 'Anorexia e Falta de apetite',
@@ -341,6 +402,13 @@ window.PALIVIDA_SEED = {
         'Parar de comer e diminui a aceitação de líquidos',
         'Perda da habilidade de engolir',
       ].join('\n'),
+      referencias: [
+        'RIBEIRO, Sabrina Corrêa da C. Cuidados paliativos no paciente crítico. 2. ed. Barueri: Manole, 2023. E-book. p.443. ISBN 9786555768824. Disponível em: https://integrada.minhabiblioteca.com.br/reader/books/9786555768824/. Acesso em: 21 jan. 2025.',
+        'COSTA, Ribeiro, Sabrina Corrêa da; CHAGA, Barrioso, Paula D.; DUTRA, Kreling, Gabriel A.; GALV. Manual de cuidados paliativos na prática . Barueri: Manole, 2026. E-book. pág.IV. ISBN 9788520457375. Disponível em: https://app.minhabiblioteca.com.br/reader/books/9788520457375/. Acesso em: 26 abr. 2026.',
+        'CARVALHO, Ricardo Tavares de; PARSONS, Henrique Afonseca (org.). Manual de cuidados paliativos. 2. ed. São Paulo: Academia Nacional de Cuidados Paliativos (ANCP), 2012.',
+        'HINKLE, Janice L.; CHEEVER, Kerry H.; OVERBAUGH, Kristen J. Brunner & Suddarth - Tratado de Enfermagem Médico-Cirúrgica - 2 Volumes . 15. ed. Rio de Janeiro: Guanabara Koogan, 2023. E-book. pág.382. ISBN 9788527739504. Disponível em: https://app.minhabiblioteca.com.br/reader/books/9788527739504/. Acesso em: 26 abr. 2026.',
+        'Thomas DR. Anorexia: aetiology, epidemiology and management in older people. Drugs Aging. 2009;26(7):557-70. doi: 10.2165/11316360-000000000-00000. PMID: 19655823.',
+      ],
     },
   ],
 
