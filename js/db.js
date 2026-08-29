@@ -1,17 +1,20 @@
 /**
- * "Backend" do PaliVida rodando 100% no navegador.
+ * "Backend" do PaliVida.
  *
  * Este arquivo reimplementa, uma a uma, as rotas de backend/src/rotas/*.js
  * do código-fonte original (mesmas validações, mesmas regras de permissão,
- * mesmos formatos de resposta) — só que em vez de Express + SQLite, os
- * "dados" ficam em localStorage. Isso existe porque um site estático não tem
- * servidor: é a forma de manter a demonstração funcional (login, cadastro,
- * registrar sintomas, editar conteúdos...) sem precisar hospedar uma API.
+ * mesmos formatos de resposta). Desde a migração para o Apps Script, as
+ * entidades compartilhadas (conteudos, sintomas, pacientes, acompanhantes,
+ * administradores, vinculos, registros) vivem numa planilha do Google
+ * Sheets, acessada via HTTP (ver "cliente Apps Script" abaixo e
+ * apps-script/README.md); só `contatos` (Hospital/Família/SAC da Home)
+ * continua em localStorage, por ser um dado pessoal de pouco valor
+ * compartilhar entre navegadores.
  *
- * Import ante: a "senha_hash" aqui é texto puro (não há bcrypt no navegador
- * por padrão, e não faz sentido "proteger" dados que o próprio visitante
- * está gerando no próprio navegador). Não é assim que o backend real
- * funciona — ver backend/src/schema.sql e utils.js no código-fonte.
+ * Importante: a "senha_hash" aqui é texto puro (não há bcrypt disponível
+ * neste ambiente, e não faz sentido "proteger" dados que o próprio
+ * visitante está gerando no próprio navegador). Não é assim que o backend
+ * real funciona — ver backend/src/schema.sql e utils.js no código-fonte.
  */
 window.PV = window.PV || {};
 
@@ -51,14 +54,15 @@ window.PV = window.PV || {};
   }
 
   /* ------------------------------------------------ cliente Apps Script */
-  // `conteudos` e `sintomas` passaram a viver numa planilha do Google
-  // Sheets, lida/escrita através deste Web App em vez do array em memória +
-  // localStorage usado pelas demais entidades. Mantemos `await atraso()`
-  // nas funções de sintomas/conteudos por consistência de UX com o resto do
-  // arquivo (mesmo "delay" percebido em todas as telas) — a latência real da
-  // requisição HTTP ao Apps Script já soma a isso, então esse atraso
-  // artificial poderia ser removido sem problema; optamos por mantê-lo para
-  // não alterar a sensação de carregamento das telas nesta migração.
+  // conteudos, sintomas, pacientes, acompanhantes, administradores,
+  // vinculos e registros vivem numa planilha do Google Sheets, lida/
+  // escrita através deste Web App — só `contatos` (Hospital/Família/SAC da
+  // Home) continua em localStorage puro. Mantemos `await atraso()` nas
+  // funções que chamam o Apps Script por consistência de UX com o resto do
+  // arquivo (mesmo "delay" percebido em todas as telas) — a latência real
+  // da requisição HTTP já soma a isso, então esse atraso artificial
+  // poderia ser removido sem problema; optamos por mantê-lo para não
+  // alterar a sensação de carregamento das telas nesta migração.
 
   async function chamarAppsScriptGet(params) {
     const url = new URL(URL_APPS_SCRIPT);
@@ -109,114 +113,21 @@ window.PV = window.PV || {};
 
   /* --------------------------------------------------------------- store */
 
-  // Nota sobre o escopo desta migração: `banco.sintomas` e `banco.conteudos`
-  // abaixo continuam existindo (populados só no seed inicial) porque
-  // `registros` (fora do escopo) ainda referencia esse `banco` como
-  // container único, mas eles NÃO são mais a fonte de verdade — quem lê e
-  // escreve sintomas/conteudos de fato é o Apps Script (ver blocos
-  // `sintomas`/`conteudos` mais abaixo). Esses arrays em `banco` ficam
-  // "congelados" no que foi semeado na primeira carga de cada navegador.
+  // Desde a migração de sintomas/conteudos/pacientes/acompanhantes/
+  // administradores/vinculos/registros para o Apps Script (planilha do
+  // Google Sheets — ver apps-script/Code.gs e apps-script/README.md),
+  // `banco` só guarda `contatos` (Hospital/Família/SAC da Home), que
+  // continua em localStorage por ser um dado pessoal de pouco valor
+  // compartilhar entre navegadores. `window.PALIVIDA_SEED` (js/data.js)
+  // deixou de alimentar este `banco`: ele agora documenta os dados que
+  // precisam ser colados manualmente nas abas da planilha na primeira
+  // configuração (sintomas, conteudos e os 3 usuários de teste) — ver
+  // apps-script/README.md, seção "Dados iniciais (seed)".
   function bancoInicial() {
-    const seed = window.PALIVIDA_SEED;
-    const agora = new Date().toISOString();
-    const hoje = agora.split('T')[0];
-
-    const banco = {
-      proximoId: { pacientes: 1, acompanhantes: 1, administradores: 1, vinculos: 1, sintomas: 1, registros: 1, conteudos: 1, contatos: 1 },
-      pacientes: [],
-      acompanhantes: [],
-      administradores: [],
-      vinculos: [],
-      sintomas: [],
-      registros: [],
-      conteudos: [],
+    return {
+      proximoId: { contatos: 1 },
       contatos: [],
     };
-
-    const proximo = (tabela) => banco.proximoId[tabela]++;
-
-    seed.sintomas.forEach((nome) => {
-      banco.sintomas.push({ id: proximo('sintomas'), nome_sintoma: nome, created_at: agora });
-    });
-
-    seed.conteudos.forEach((c) => {
-      banco.conteudos.push({
-        id: proximo('conteudos'),
-        titulo: c.titulo,
-        descricao: c.descricao,
-        texto: c.descricao,
-        sinaissintomas: c.sinaissintomas,
-        sinaisalerta: c.sinaisalerta,
-        data_post: hoje,
-      });
-    });
-
-    const u = seed.usuarios;
-    banco.administradores.push({
-      id: proximo('administradores'),
-      nome: u.administrador.nome,
-      nome_social: null,
-      email: u.administrador.email,
-      senha_hash: u.administrador.senha,
-      telefone: null,
-      genero: null,
-      data_nascimento: null,
-      conselho_profissional: u.administrador.conselho_profissional,
-      formacao: u.administrador.formacao,
-      registro_profissional: null,
-      especialidade: null,
-      created_at: agora,
-    });
-    banco.pacientes.push({
-      id: proximo('pacientes'),
-      nome: u.paciente.nome,
-      nome_social: null,
-      email: u.paciente.email,
-      senha_hash: u.paciente.senha,
-      celular: null,
-      genero: null,
-      data_nascimento: null,
-      cidade: u.paciente.cidade,
-      estado: u.paciente.estado,
-      tipo_sanguineo: u.paciente.tipo_sanguineo,
-      condicoes_medicas: null,
-      medicacao: null,
-      contato_emergencia: null,
-      unidades_de_saude: null,
-      created_at: agora,
-    });
-    banco.acompanhantes.push({
-      id: proximo('acompanhantes'),
-      nome_completo: u.acompanhante.nome_completo,
-      nome_social: null,
-      email: u.acompanhante.email,
-      senha_hash: u.acompanhante.senha,
-      telefone: null,
-      genero: null,
-      data_nascimento: null,
-      relacionamento: u.acompanhante.relacionamento,
-      created_at: agora,
-    });
-
-    banco.vinculos.push({
-      id: proximo('vinculos'),
-      paciente_id: banco.pacientes[0].id,
-      acompanhante_id: banco.acompanhantes[0].id,
-      created_at: agora,
-    });
-
-    const idsSintomas = banco.sintomas.slice(0, 4).map((s) => s.id);
-    seed.registrosIniciais.forEach((intensidade, i) => {
-      banco.registros.push({
-        id: proximo('registros'),
-        paciente_id: banco.pacientes[0].id,
-        sintoma_id: idsSintomas[i % idsSintomas.length],
-        intensidade,
-        data_registro: agora,
-      });
-    });
-
-    return banco;
   }
 
   let banco = carregar();
@@ -283,13 +194,18 @@ window.PV = window.PV || {};
     }
   }
 
-  function podeVerPaciente(usuario, pacienteId) {
+  // Assíncrona desde a migração de `vinculos` para a planilha (ver bloco
+  // `vinculos` mais abaixo) — precisa consultar o Apps Script para saber se
+  // o acompanhante está de fato vinculado ao paciente. Todo chamador foi
+  // atualizado para `await`.
+  async function podeVerPaciente(usuario, pacienteId) {
     if (!usuario) return false;
     pacienteId = Number(pacienteId);
     if (usuario.tipo === 'administrador') return true;
     if (usuario.tipo === 'paciente') return Number(usuario.id) === pacienteId;
     if (usuario.tipo === 'acompanhante') {
-      return banco.vinculos.some(
+      const todosVinculos = await chamarAppsScriptGet({ acao: 'listar', tabela: 'vinculos' });
+      return todosVinculos.some(
         (v) => Number(v.paciente_id) === pacienteId && Number(v.acompanhante_id) === Number(usuario.id),
       );
     }
@@ -321,11 +237,23 @@ window.PV = window.PV || {};
   // telas chamem PV.db.auth.login(...), PV.db.conteudos.listar()... como no
   // app original chamava api.auth.login(...), api.conteudos.listar()...
 
+  // Referências bibliográficas chegam da planilha como uma única célula de
+  // texto (uma referência por linha, mesmo padrão de "; " usado em
+  // SinaisSintomas/SinaisAlerta na tela de Triagem — ver js/screens/
+  // triagem.js). Aqui viram array para as telas iterarem direto.
+  function dividirReferencias(texto) {
+    return String(texto || '')
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
   function normalizarConteudo(bruto) {
     return {
       ...bruto,
       SinaisSintomas: bruto?.SinaisSintomas ?? bruto?.sinaissintomas ?? '',
       SinaisAlerta: bruto?.SinaisAlerta ?? bruto?.sinaisalerta ?? '',
+      Referencias: dividirReferencias(bruto?.Referencias ?? bruto?.referencias ?? ''),
     };
   }
 
@@ -335,24 +263,11 @@ window.PV = window.PV || {};
       if (!emailValido(email)) erro('E-mail inválido.', 400);
       if (!senha) erro('Informe a senha.', 400);
 
-      const alvo = String(email).trim().toLowerCase();
-      const tabelas = [
-        ['pacientes', 'paciente'],
-        ['acompanhantes', 'acompanhante'],
-        ['administradores', 'administrador'],
-      ];
-      let encontrado = null;
-      for (const [tabela, tipo] of tabelas) {
-        const registro = banco[tabela].find((r) => r.email.toLowerCase() === alvo);
-        if (registro) {
-          encontrado = { ...registro, tipo };
-          break;
-        }
-      }
-
-      if (!encontrado || encontrado.senha_hash !== senha) {
-        erro('E-mail ou senha incorretos.', 401);
-      }
+      // pacientes/acompanhantes/administradores vivem na planilha (ver
+      // apps-script/Code.gs, ação 'login' de doGet) — essa ação não exige
+      // token de escrita (é leitura), mas também nunca devolve senha_hash,
+      // só confirma se a senha bate e já devolve o registro com `tipo`.
+      const encontrado = await chamarAppsScriptGet({ acao: 'login', email, senha });
 
       const user = { id: encontrado.id, email: encontrado.email, tipo: encontrado.tipo };
       return { success: true, token: gerarToken(user), user };
@@ -405,19 +320,26 @@ window.PV = window.PV || {};
   };
 
   const registros = {
+    // "Prontuário": histórico de sintomas registrados por cada paciente.
+    // Vive na planilha (aba `registros`, ver apps-script/Code.gs) desde
+    // esta migração — antes ficava em `banco.registros` (localStorage), o
+    // que impedia, por exemplo, um administrador ver o histórico de um
+    // paciente a partir de outro navegador/dispositivo.
     async listar() {
       await atraso();
       const usuario = exigirAutenticacao();
+      const todos = await chamarAppsScriptGet({ acao: 'listar', tabela: 'registros' });
       let lista;
       if (usuario.tipo === 'administrador') {
-        lista = [...banco.registros];
+        lista = todos;
       } else if (usuario.tipo === 'paciente') {
-        lista = banco.registros.filter((r) => Number(r.paciente_id) === Number(usuario.id));
+        lista = todos.filter((r) => Number(r.paciente_id) === Number(usuario.id));
       } else {
+        const todosVinculos = await chamarAppsScriptGet({ acao: 'listar', tabela: 'vinculos' });
         const pacientesVinculados = new Set(
-          banco.vinculos.filter((v) => Number(v.acompanhante_id) === Number(usuario.id)).map((v) => v.paciente_id),
+          todosVinculos.filter((v) => Number(v.acompanhante_id) === Number(usuario.id)).map((v) => Number(v.paciente_id)),
         );
-        lista = banco.registros.filter((r) => pacientesVinculados.has(r.paciente_id));
+        lista = todos.filter((r) => pacientesVinculados.has(Number(r.paciente_id)));
       }
       return lista.sort((a, b) => new Date(b.data_registro) - new Date(a.data_registro));
     },
@@ -432,24 +354,17 @@ window.PV = window.PV || {};
         Number.isInteger(sintoma_id) && sintoma_id > 0 &&
         Number.isInteger(intensidade) && intensidade >= 0 && intensidade <= 10;
       if (!valido) erro('Dados inválidos: informe paciente, sintoma e intensidade (0 a 10).', 400);
-      if (!podeVerPaciente(usuario, paciente_id)) {
+      if (!(await podeVerPaciente(usuario, paciente_id))) {
         erro('Você não pode registrar sintomas para este paciente.', 403);
       }
-      // `sintomas` migrou para a planilha (ver bloco `sintomas` acima);
-      // `registros` continua em localStorage, fora do escopo desta
-      // migração, mas precisa validar o sintoma_id contra a fonte atual.
       const sintomasAtuais = await chamarAppsScriptGet({ acao: 'listar', tabela: 'sintomas' });
       if (!sintomasAtuais.some((s) => Number(s.id) === sintoma_id)) erro('Sintoma não encontrado.', 404);
 
-      const registro = {
-        id: banco.proximoId.registros++,
-        paciente_id,
-        sintoma_id,
-        intensidade,
-        data_registro: new Date().toISOString(),
-      };
-      banco.registros.push(registro);
-      salvar();
+      const registro = await chamarAppsScriptPost({
+        acao: 'criar',
+        tabela: 'registros',
+        dados: { paciente_id, sintoma_id, intensidade, data_registro: new Date().toISOString() },
+      });
       return { registro };
     },
   };
@@ -483,6 +398,9 @@ window.PV = window.PV || {};
           texto: dados.texto ?? dados.descricao ?? null,
           sinaissintomas: dados.SinaisSintomas ?? dados.sinaissintomas ?? null,
           sinaisalerta: dados.SinaisAlerta ?? dados.sinaisalerta ?? null,
+          referencias: Array.isArray(dados.Referencias)
+            ? dados.Referencias.join('\n')
+            : dados.Referencias ?? dados.referencias ?? null,
           data_post: dados.data_post ?? new Date().toISOString().split('T')[0],
         },
       });
@@ -496,12 +414,14 @@ window.PV = window.PV || {};
       // lado da planilha (ver atualizarLinha() em apps-script/Code.gs), mas
       // aqui já filtramos os `undefined` para não mandar chave nenhuma nesse
       // caso, deixando explícito o que está de fato sendo alterado.
+      const referenciasEnviadas = dados.Referencias ?? dados.referencias;
       const camposEnviados = {
         titulo: dados.titulo,
         descricao: dados.descricao,
         texto: dados.texto ?? dados.descricao,
         sinaissintomas: dados.SinaisSintomas ?? dados.sinaissintomas,
         sinaisalerta: dados.SinaisAlerta ?? dados.sinaisalerta,
+        referencias: Array.isArray(referenciasEnviadas) ? referenciasEnviadas.join('\n') : referenciasEnviadas,
         data_post: dados.data_post,
       };
       const normalizado = { id };
@@ -586,6 +506,12 @@ window.PV = window.PV || {};
     },
   };
 
+  // pacientes/acompanhantes/administradores/vinculos vivem na planilha (ver
+  // apps-script/Code.gs) desde esta migração — antes ficavam em `banco`
+  // (localStorage). As validações de permissão continuam aqui no site,
+  // antes de qualquer chamada ao Apps Script, exatamente como já acontecia
+  // para `sintomas`/`conteudos`.
+
   const CAMPOS_PACIENTE = [
     'nome', 'nome_social', 'email', 'celular', 'genero', 'data_nascimento',
     'cidade', 'estado', 'tipo_sanguineo', 'condicoes_medicas', 'medicacao',
@@ -600,44 +526,47 @@ window.PV = window.PV || {};
       if (!dados.senha || String(dados.senha).length < 6) erro('A senha precisa ter ao menos 6 caracteres.', 400);
 
       const email = String(dados.email).trim().toLowerCase();
-      if (banco.pacientes.some((p) => p.email.toLowerCase() === email)) {
-        erro('Já existe um cadastro com este e-mail.', 409);
-      }
+      const registro = { email, senha_hash: dados.senha, created_at: new Date().toISOString() };
+      CAMPOS_PACIENTE.forEach((c) => { if (c !== 'email') registro[c] = dados[c] ?? null; });
 
-      const paciente = { id: banco.proximoId.pacientes++, senha_hash: dados.senha, created_at: new Date().toISOString() };
-      CAMPOS_PACIENTE.forEach((c) => (paciente[c] = c === 'email' ? email : dados[c] ?? null));
-      banco.pacientes.push(paciente);
-      salvar();
-      return semSenha(paciente);
+      // criarLinha('pacientes', ...) valida e-mail único e senha mínima de
+      // novo no Apps Script (validarCadastro()) — dupla checagem, já que
+      // esta é uma ação de escrita pública (sem token), diferente das
+      // demais chamadas deste arquivo.
+      const criado = await chamarAppsScriptPost({ acao: 'criar', tabela: 'pacientes', dados: registro });
+      return criado;
     },
     async buscar(id) {
       await atraso();
       const usuario = exigirAutenticacao();
-      if (!podeVerPaciente(usuario, id)) erro('Você não tem permissão para ver este paciente.', 403);
-      const paciente = banco.pacientes.find((p) => Number(p.id) === Number(id));
-      if (!paciente) erro('Paciente não encontrado.', 404);
+      if (!(await podeVerPaciente(usuario, id))) erro('Você não tem permissão para ver este paciente.', 403);
+      const paciente = await chamarAppsScriptGet({ acao: 'buscar', tabela: 'pacientes', id });
       return semSenha(paciente);
     },
     async atualizar(id, dados) {
       await atraso();
       const usuario = exigirAutenticacao();
-      if (!podeVerPaciente(usuario, id)) erro('Você não tem permissão para editar este paciente.', 403);
-      const paciente = banco.pacientes.find((p) => Number(p.id) === Number(id));
-      if (!paciente) erro('Paciente não encontrado.', 404);
-      aplicarUpdate(paciente, CAMPOS_PACIENTE, dados);
-      if (dados.senha) paciente.senha_hash = dados.senha;
-      salvar();
-      return semSenha(paciente);
+      if (!(await podeVerPaciente(usuario, id))) erro('Você não tem permissão para editar este paciente.', 403);
+      const camposEnviados = { id };
+      CAMPOS_PACIENTE.forEach((c) => { if (dados[c] !== undefined) camposEnviados[c] = dados[c]; });
+      if (dados.senha) camposEnviados.senha_hash = dados.senha;
+      const atualizado = await chamarAppsScriptPost({ acao: 'atualizar', tabela: 'pacientes', dados: camposEnviados });
+      if (!atualizado) erro('Paciente não encontrado.', 404);
+      return semSenha(atualizado);
     },
     async acompanhantes(id) {
       await atraso();
       const usuario = exigirAutenticacao();
-      if (!podeVerPaciente(usuario, id)) erro('Você não tem permissão para ver estes vínculos.', 403);
-      const idsVinculados = banco.vinculos
+      if (!(await podeVerPaciente(usuario, id))) erro('Você não tem permissão para ver estes vínculos.', 403);
+      const [todosVinculos, todosAcompanhantes] = await Promise.all([
+        chamarAppsScriptGet({ acao: 'listar', tabela: 'vinculos' }),
+        chamarAppsScriptGet({ acao: 'listar', tabela: 'acompanhantes' }),
+      ]);
+      const idsVinculados = todosVinculos
         .filter((v) => Number(v.paciente_id) === Number(id))
-        .map((v) => v.acompanhante_id);
-      const lista = banco.acompanhantes
-        .filter((a) => idsVinculados.includes(a.id))
+        .map((v) => Number(v.acompanhante_id));
+      const lista = todosAcompanhantes
+        .filter((a) => idsVinculados.includes(Number(a.id)))
         .sort((a, b) => a.nome_completo.localeCompare(b.nome_completo))
         .map(semSenha);
       return lista;
@@ -654,44 +583,43 @@ window.PV = window.PV || {};
       if (!dados.senha || String(dados.senha).length < 6) erro('A senha precisa ter ao menos 6 caracteres.', 400);
 
       const email = String(dados.email).trim().toLowerCase();
-      if (banco.acompanhantes.some((a) => a.email.toLowerCase() === email)) {
-        erro('Já existe um cadastro com este e-mail.', 409);
-      }
+      const registro = { email, senha_hash: dados.senha, created_at: new Date().toISOString() };
+      CAMPOS_ACOMPANHANTE.forEach((c) => { if (c !== 'email') registro[c] = dados[c] ?? null; });
 
-      const acompanhante = { id: banco.proximoId.acompanhantes++, senha_hash: dados.senha, created_at: new Date().toISOString() };
-      CAMPOS_ACOMPANHANTE.forEach((c) => (acompanhante[c] = c === 'email' ? email : dados[c] ?? null));
-      banco.acompanhantes.push(acompanhante);
-      salvar();
-      return semSenha(acompanhante);
+      const criado = await chamarAppsScriptPost({ acao: 'criar', tabela: 'acompanhantes', dados: registro });
+      return criado;
     },
     async buscar(id) {
       await atraso();
       const usuario = exigirAutenticacao();
       if (!ehODono(usuario, id)) erro('Você não tem permissão para ver este cadastro.', 403);
-      const acompanhante = banco.acompanhantes.find((a) => Number(a.id) === Number(id));
-      if (!acompanhante) erro('Acompanhante não encontrado.', 404);
+      const acompanhante = await chamarAppsScriptGet({ acao: 'buscar', tabela: 'acompanhantes', id });
       return semSenha(acompanhante);
     },
     async atualizar(id, dados) {
       await atraso();
       const usuario = exigirAutenticacao();
       if (!ehODono(usuario, id)) erro('Você não tem permissão para editar este cadastro.', 403);
-      const acompanhante = banco.acompanhantes.find((a) => Number(a.id) === Number(id));
-      if (!acompanhante) erro('Acompanhante não encontrado.', 404);
-      aplicarUpdate(acompanhante, CAMPOS_ACOMPANHANTE, dados);
-      if (dados.senha) acompanhante.senha_hash = dados.senha;
-      salvar();
-      return semSenha(acompanhante);
+      const camposEnviados = { id };
+      CAMPOS_ACOMPANHANTE.forEach((c) => { if (dados[c] !== undefined) camposEnviados[c] = dados[c]; });
+      if (dados.senha) camposEnviados.senha_hash = dados.senha;
+      const atualizado = await chamarAppsScriptPost({ acao: 'atualizar', tabela: 'acompanhantes', dados: camposEnviados });
+      if (!atualizado) erro('Acompanhante não encontrado.', 404);
+      return semSenha(atualizado);
     },
     async pacientes(id) {
       await atraso();
       const usuario = exigirAutenticacao();
       if (!ehODono(usuario, id)) erro('Você não tem permissão para ver estes vínculos.', 403);
-      const idsVinculados = banco.vinculos
+      const [todosVinculos, todosPacientes] = await Promise.all([
+        chamarAppsScriptGet({ acao: 'listar', tabela: 'vinculos' }),
+        chamarAppsScriptGet({ acao: 'listar', tabela: 'pacientes' }),
+      ]);
+      const idsVinculados = todosVinculos
         .filter((v) => Number(v.acompanhante_id) === Number(id))
-        .map((v) => v.paciente_id);
-      const lista = banco.pacientes
-        .filter((p) => idsVinculados.includes(p.id))
+        .map((v) => Number(v.paciente_id));
+      const lista = todosPacientes
+        .filter((p) => idsVinculados.includes(Number(p.id)))
         .sort((a, b) => a.nome.localeCompare(b.nome))
         .map(semSenha);
       return lista;
@@ -708,14 +636,14 @@ window.PV = window.PV || {};
       await atraso();
       const usuario = exigirAutenticacao();
       exigirPerfil(usuario, 'administrador');
-      return [...banco.administradores].sort((a, b) => a.nome.localeCompare(b.nome)).map(semSenha);
+      const lista = await chamarAppsScriptGet({ acao: 'listar', tabela: 'administradores' });
+      return [...lista].sort((a, b) => a.nome.localeCompare(b.nome)).map(semSenha);
     },
     async buscar(id) {
       await atraso();
       const usuario = exigirAutenticacao();
       exigirPerfil(usuario, 'administrador');
-      const admin = banco.administradores.find((a) => Number(a.id) === Number(id));
-      if (!admin) erro('Administrador não encontrado.', 404);
+      const admin = await chamarAppsScriptGet({ acao: 'buscar', tabela: 'administradores', id });
       return semSenha(admin);
     },
     async atualizar(id, dados) {
@@ -723,12 +651,12 @@ window.PV = window.PV || {};
       const usuario = exigirAutenticacao();
       exigirPerfil(usuario, 'administrador');
       if (Number(usuario.id) !== Number(id)) erro('Você só pode editar o seu próprio cadastro.', 403);
-      const admin = banco.administradores.find((a) => Number(a.id) === Number(id));
-      if (!admin) erro('Administrador não encontrado.', 404);
-      aplicarUpdate(admin, CAMPOS_ADMIN, dados);
-      if (dados.senha) admin.senha_hash = dados.senha;
-      salvar();
-      return semSenha(admin);
+      const camposEnviados = { id };
+      CAMPOS_ADMIN.forEach((c) => { if (dados[c] !== undefined) camposEnviados[c] = dados[c]; });
+      if (dados.senha) camposEnviados.senha_hash = dados.senha;
+      const atualizado = await chamarAppsScriptPost({ acao: 'atualizar', tabela: 'administradores', dados: camposEnviados });
+      if (!atualizado) erro('Administrador não encontrado.', 404);
+      return semSenha(atualizado);
     },
   };
 
@@ -742,15 +670,23 @@ window.PV = window.PV || {};
       const acompanhanteId = usuario.tipo === 'acompanhante' ? usuario.id : undefined;
       if (!acompanhanteId) erro('Informe o acompanhante.', 400);
       if (usuario.tipo === 'paciente') erro('Somente o cuidador ou o administrador pode criar vínculos.', 403);
-      if (!banco.pacientes.some((p) => Number(p.id) === paciente_id)) {
+
+      const [todosPacientes, todosVinculos] = await Promise.all([
+        chamarAppsScriptGet({ acao: 'listar', tabela: 'pacientes' }),
+        chamarAppsScriptGet({ acao: 'listar', tabela: 'vinculos' }),
+      ]);
+      if (!todosPacientes.some((p) => Number(p.id) === paciente_id)) {
         erro('Paciente não encontrado. Confira o código informado.', 404);
       }
-      if (banco.vinculos.some((v) => Number(v.paciente_id) === paciente_id && Number(v.acompanhante_id) === Number(acompanhanteId))) {
+      if (todosVinculos.some((v) => Number(v.paciente_id) === paciente_id && Number(v.acompanhante_id) === Number(acompanhanteId))) {
         erro('Este vínculo já existe.', 409);
       }
 
-      banco.vinculos.push({ id: banco.proximoId.vinculos++, paciente_id, acompanhante_id: acompanhanteId, created_at: new Date().toISOString() });
-      salvar();
+      await chamarAppsScriptPost({
+        acao: 'criar',
+        tabela: 'vinculos',
+        dados: { paciente_id, acompanhante_id: acompanhanteId, created_at: new Date().toISOString() },
+      });
     },
     async remover(acompanhante_id, paciente_id) {
       await atraso();
@@ -765,12 +701,12 @@ window.PV = window.PV || {};
         (usuario.tipo === 'acompanhante' && Number(usuario.id) === acompanhante_id);
       if (!autorizado) erro('Você não pode remover este vínculo.', 403);
 
-      const antes = banco.vinculos.length;
-      banco.vinculos = banco.vinculos.filter(
-        (v) => !(Number(v.paciente_id) === paciente_id && Number(v.acompanhante_id) === acompanhante_id),
+      const todosVinculos = await chamarAppsScriptGet({ acao: 'listar', tabela: 'vinculos' });
+      const alvo = todosVinculos.find(
+        (v) => Number(v.paciente_id) === paciente_id && Number(v.acompanhante_id) === acompanhante_id,
       );
-      if (banco.vinculos.length === antes) erro('Vínculo não encontrado.', 404);
-      salvar();
+      if (!alvo) erro('Vínculo não encontrado.', 404);
+      await chamarAppsScriptPost({ acao: 'remover', tabela: 'vinculos', dados: { id: alvo.id } });
     },
   };
 
