@@ -840,14 +840,18 @@ textarea.pv-campo-input { min-height: 90px; resize: vertical; }
    Portal Clínico — restilizada para o app-shell de telefone, reaproveitando
    as variáveis de cor e os componentes (.pv-card, .botao-enviar, .campo...)
    já usados no restante do site. */
-.tela-triagem { flex: 1; background: var(--areia-clara); padding: 0 0 24px; }
-.tela-triagem .titulo { font-size: 24px; font-weight: 700; color: var(--azul); text-align: center; margin: 20px 16px 6px; }
+/* Paleta e formas alinhadas com a tela de Sintomas (.tela-menu-sintomas /
+   .pv-card-sintoma) — mesmo fundo creme, mesma borda escura arredondada nos
+   cartões, mesma tipografia/tom — mantendo apenas o comportamento próprio
+   da Triagem (accordion + checkboxes + busca + medidor). */
+.tela-triagem { flex: 1; background: var(--creme); padding: 0 0 24px; }
+.tela-triagem .titulo { font-size: clamp(18px, 5.5vw, 26px); font-weight: 700; color: var(--azul); text-align: center; margin: 20px 16px 6px; line-height: 1.25; }
 .tela-triagem .subtitulo { font-size: 14px; color: var(--marrom); text-align: center; margin: 0 20px 16px; }
 
 .pv-triagem-intro { padding-top: 4px; }
 .pv-triagem-busca-wrap {
-  display: flex; align-items: center; gap: 8px; background: var(--branco); border-radius: var(--radius-pill);
-  padding: 4px 6px 4px 16px; margin: 0 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  display: flex; align-items: center; gap: 8px; background: var(--branco); border: 1px solid #444; border-radius: var(--radius-pill);
+  padding: 4px 6px 4px 16px; margin: 0 16px;
 }
 .pv-triagem-busca { flex: 1; border: 0; background: none; padding: 10px 0; font-size: 15px; color: var(--azul); font-family: var(--fonte-regular); }
 .pv-triagem-busca:focus { outline: none; }
@@ -864,8 +868,8 @@ textarea.pv-campo-input { min-height: 90px; resize: vertical; }
 .pv-ponto { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: currentColor; }
 
 .pv-triagem-sugestoes {
-  list-style: none; margin: 6px 16px 0; padding: 6px; background: var(--branco); border-radius: var(--radius-md);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15); max-height: 220px; overflow-y: auto;
+  list-style: none; margin: 6px 16px 0; padding: 6px; background: var(--branco); border: 1px solid #444; border-radius: var(--radius-md);
+  max-height: 220px; overflow-y: auto;
 }
 .pv-triagem-sugestoes li {
   display: flex; justify-content: space-between; align-items: center; padding: 10px 8px; font-size: 13px;
@@ -875,7 +879,7 @@ textarea.pv-campo-input { min-height: 90px; resize: vertical; }
 .pv-triagem-tag { font-size: 10px; text-transform: uppercase; color: var(--azul-medio); font-weight: 700; }
 
 /* medidor de nível de atenção */
-.pv-triagem-medidor { margin: 16px 16px 0; background: var(--branco); border-radius: var(--radius-lg); padding: 14px 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.pv-triagem-medidor { margin: 16px 16px 0; background: #F9F6EE; border: 1px solid #444; border-radius: var(--radius-lg); padding: 14px 16px; }
 .pv-triagem-medidor-cabecalho { display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: var(--azul); font-size: 15px; margin-bottom: 10px; }
 .pv-triagem-limpar { background: none; border: 0; font-size: 12px; color: var(--azul-medio); text-decoration: underline; }
 .pv-triagem-barra-fundo { position: relative; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--verde), var(--amarelo), var(--vermelho)); margin-bottom: 6px; }
@@ -886,35 +890,36 @@ textarea.pv-campo-input { min-height: 90px; resize: vertical; }
 .pv-triagem-banner.amarelo { background: #FFF6DA; color: #7A5B00; }
 .pv-triagem-banner.vermelho { background: var(--erro-fundo); color: var(--erro-texto); }
 
-/* lista de cards acordeão */
-.pv-triagem-lista { display: flex; flex-direction: column; gap: 12px; padding: 12px 16px 0; }
-.pv-triagem-card { background: var(--branco); border-radius: var(--radius-lg); box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; scroll-margin-top: 12px; }
+/* lista de cards acordeão — mesmo tom de fundo (#F9F6EE) e borda (1px solid
+   #444) que .pv-card-sintoma usa na tela de Sintomas */
+.pv-triagem-lista { display: flex; flex-direction: column; gap: 10px; padding: 12px 16px 0; }
+.pv-triagem-card { background: #F9F6EE; border: 1px solid #444; border-radius: 12px; overflow: hidden; scroll-margin-top: 12px; }
 .pv-triagem-cabecalho { width: 100%; display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: none; border: 0; text-align: left; }
 .pv-triagem-titulo { flex: 1; font-weight: 700; color: var(--azul); font-size: 15px; }
-.pv-triagem-seta { font-size: 11px; color: var(--cinza-claro); transition: transform 0.2s ease; }
+.pv-triagem-seta { font-size: 11px; color: var(--marrom); transition: transform 0.2s ease; }
 .pv-triagem-card.aberto .pv-triagem-seta { transform: rotate(180deg); }
 .pv-triagem-corpo { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; padding: 0 16px; }
-.pv-triagem-card.aberto .pv-triagem-corpo { max-height: 2000px; padding: 0 16px 16px; }
-.pv-triagem-definicao { font-size: 13px; line-height: 20px; color: #444; margin-bottom: 10px; }
+.pv-triagem-card.aberto .pv-triagem-corpo { max-height: 3000px; padding: 0 16px 16px; border-top: 1px solid #4442; }
+.pv-triagem-definicao { font-size: 13px; line-height: 20px; color: #444; margin: 12px 0 10px; }
 .pv-triagem-rotulo { font-size: 12px; font-weight: 700; color: var(--azul); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
 .pv-triagem-rotulo.alerta { color: var(--perigo-claro); margin-top: 14px; }
 .pv-triagem-grade { display: flex; flex-direction: column; gap: 6px; }
 .pv-triagem-check {
-  display: flex; align-items: center; gap: 8px; font-size: 13px; color: #333; background: var(--areia-clara);
-  border-radius: 8px; padding: 8px 10px;
+  display: flex; align-items: center; gap: 8px; font-size: 13px; color: #333; background: var(--branco);
+  border: 1px solid #4443; border-radius: 8px; padding: 8px 10px;
 }
-.pv-triagem-check.selecionado { background: #E4F0E9; color: #1C5A3A; font-weight: 700; }
-.pv-triagem-check.selecionado.alerta { background: var(--erro-fundo); color: var(--erro-texto); }
+.pv-triagem-check.selecionado { background: #E4F0E9; color: #1C5A3A; font-weight: 700; border-color: #1C5A3A55; }
+.pv-triagem-check.selecionado.alerta { background: var(--erro-fundo); color: var(--erro-texto); border-color: var(--erro-texto); }
 .pv-triagem-alerta-secao { margin-top: 6px; }
-.pv-triagem-refs { margin-top: 12px; font-size: 12px; color: var(--cinza-claro); }
-.pv-triagem-refs summary { cursor: pointer; font-weight: 700; }
+.pv-triagem-refs { margin-top: 14px; font-size: 12px; color: var(--marrom); border-top: 1px solid #4442; padding-top: 10px; }
+.pv-triagem-refs summary { cursor: pointer; font-weight: 700; color: var(--azul); }
 .pv-triagem-refs ul { margin: 8px 0 0; padding-left: 18px; }
-.pv-triagem-refs li { margin-bottom: 6px; }
+.pv-triagem-refs li { margin-bottom: 6px; line-height: 1.4; }
 
 .pv-triagem-links { display: flex; flex-direction: column; gap: 10px; padding: 20px 16px 0; }
 .pv-triagem-link {
-  background: var(--azul-medio); color: var(--branco-quente); border: 0; border-radius: var(--radius-md);
-  padding: 14px; font-size: 14px; font-weight: 700;
+  background: var(--azul-botao); color: var(--branco); border: 0; border-radius: var(--radius-md);
+  padding: 14px; font-size: 14px; font-weight: 700; box-shadow: 4px 4px 6px rgba(0,0,0,0.25);
 }
 
 /* =================================================== Carteirinha (wizard) === */
