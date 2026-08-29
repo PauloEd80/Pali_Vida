@@ -66,7 +66,14 @@ window.PV = window.PV || {};
 
   async function chamarAppsScriptGet(params) {
     const url = new URL(URL_APPS_SCRIPT);
+    // O token vai em toda leitura (mesmo em conteudos/sintomas, onde não é
+    // exigido) para simplificar: o Code.gs só valida o token nas tabelas
+    // protegidas (pacientes/acompanhantes/administradores/vinculos/
+    // registros — ver validarLeituraPublica() lá). Sem isso, a leitura
+    // dessas tabelas nunca teria como se autenticar, já que doGet não
+    // aceitava token nenhum antes desta correção.
     Object.entries(params).forEach(([chave, valor]) => url.searchParams.set(chave, valor));
+    if (params.acao !== 'login') url.searchParams.set('token', TOKEN_APPS_SCRIPT);
 
     let resposta;
     try {
