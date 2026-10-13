@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>PaliVida — cuidados paliativos</title>
+  <meta name="description" content="PaliVida — identificação de piora clínica, triagem de sintomas, prontuário eletrônico e direcionamento ao serviço de urgência em cuidados paliativos.">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header id="app-header" class="pv-header" hidden></header>
+    <main id="app-main" class="app-main" role="main"></main>
+    <footer id="app-footer" class="pv-footer" hidden></footer>
+  </div>
+
+  <!-- dados de demonstração + "backend" local (localStorage) -->
+  <script src="js/data.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/db.js"></script>
+
+  <!-- UI compartilhada e roteador -->
+  <script src="js/ui.js"></script>
+  <script src="js/router.js"></script>
+
+  <!-- telas -->
+  <script src="js/screens/auth.js"></script>
+  <script src="js/screens/principal.js"></script>
+  <script src="js/screens/sintomas.js"></script>
+  <script src="js/screens/triagem.js"></script>
+  <script src="js/screens/perfil.js"></script>
+  <script src="js/screens/admin.js"></script>
+
+  <!-- inicialização -->
+  <script src="js/main.js"></script>
+</body>
+</html>
