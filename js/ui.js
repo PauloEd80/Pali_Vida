@@ -75,11 +75,28 @@ window.PV = window.PV || {};
      - header(): usado em todas as outras telas (autenticadas) — mostra
        apenas o ícone/logo da marca, sem o nome por extenso e sem tarja,
        ancorado no canto superior esquerdo. */
-  // `grande: true` (usado só na tela inicial de Login) aumenta a logo; as
-  // demais telas públicas (Cadastro, Recuperar senha) mantêm o tamanho padrão.
+  // Logo desenhada em SVG + texto (não usa mais a imagem PNG de 196x60, que
+  // ficava pixelada e cortada ao ser ampliada). `grande: true` (só na tela
+  // inicial de Login) aumenta a logo; as demais telas públicas (Cadastro,
+  // Recuperar senha) usam o tamanho padrão.
   function headerLogin(opcoes = {}) {
     const classe = opcoes.grande ? 'pv-header pv-header--login pv-header--login-grande' : 'pv-header pv-header--login';
-    return `<div class="${classe}"><img class="pv-logo-completo" src="assets/img/logo-completo.png" alt="PaliVida"></div>`;
+    return `
+      <div class="${classe}">
+        <div class="pv-marca" role="img" aria-label="PaliVida">
+          <svg class="pv-marca-icone" viewBox="0 0 60 60" aria-hidden="true">
+            <defs>
+              <linearGradient id="pv-marca-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#8A78C8"/>
+                <stop offset="1" stop-color="#6B47D1"/>
+              </linearGradient>
+            </defs>
+            <rect x="23" y="5" width="14" height="50" rx="7" fill="url(#pv-marca-grad)"/>
+            <rect x="5" y="23" width="50" height="14" rx="7" fill="url(#pv-marca-grad)"/>
+          </svg>
+          <span class="pv-marca-texto">PaliVida</span>
+        </div>
+      </div>`;
   }
 
   function header() {
