@@ -157,17 +157,27 @@ a { color: inherit; }
   justify-content: center;
   padding: 18px 16px 4px;
 }
-.pv-header--login .pv-logo-completo {
-  height: 46px;
-  width: auto;
-}
-/* Logo ampliada só na tela inicial de Login (sem o título "Entrar" acima
-   do formulário, a logo ocupa esse espaço). */
+/* Logo da tela de login/cadastro: ícone SVG + texto, tudo em vetor (nítido em
+   qualquer tamanho). O tamanho vem de --marca-tam (altura do ícone). */
+.pv-header--login { --marca-tam: 40px; }
 .pv-header.pv-header--login-grande {
+  --marca-tam: 64px;
   padding: 30px 16px 26px;
 }
-.pv-header--login-grande .pv-logo-completo {
-  height: 80px;
+.pv-marca {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--marca-tam) * 0.28);
+  line-height: 1;
+}
+.pv-marca-icone { width: var(--marca-tam); height: var(--marca-tam); flex-shrink: 0; }
+.pv-marca-texto {
+  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 800;
+  font-size: calc(var(--marca-tam) * 0.8);
+  letter-spacing: -0.02em;
+  color: #186358;
+  padding-bottom: 0.12em; /* evita cortar a base das letras */
 }
 
 /* ======================================================== Footer.tsx ===
